@@ -3,7 +3,7 @@
 {% block content %}
     <h1>Use Case Selection</h1>
     <h2>Choose Dataset and Model</h2>
-    <form action="/process_selection" method="POST">
+    <form action="/run_experiment" method="POST">
         <label for="dataset">Select a Dataset:</label>
         <select id="dataset" name="dataset">
             <option value="" selected disabled>Select a Dataset</option> <!-- Default option -->
@@ -118,6 +118,9 @@
     var number_of_windows_periodic_drift = document.getElementById("number_of_windows_periodic_drift");
     var drift_offset_sudden_drift = document.getElementById("drift_offset_sudden_drift");
     var drift_percentage_sudden_drift = document.getElementById("drift_percentage_sudden_drift");
+    var drift_offset_incremental_drift = document.getElementById("drift_offset_incremental_drift");
+    var drift_percentage_incremental_drift = document.getElementById("drift_percentage_incremental_drift");
+    var drift_increasing_percentage_incremental_drift = document.getElementById("drift_increasing_percentage_incremental_drift");
 
     // Convert the datasets variable from JSON format
     var datasets = JSON.parse('{{ data|tojson|safe }}');
@@ -219,12 +222,31 @@
         var outputElement = this.nextElementSibling; // Get the <output> element for this input
         outputElement.textContent = this.value; // Update the <output> element with the current value
         validateForm(); // Call your validation function (if needed)
+
+        // Update the max attribute of drift_offset_sudden_drift
+        drift_offset_sudden_drift.max = this.value;
+
+        // Calculate a new initial value based on the selected number_of_windows_sudden_drift
+        var initialValue = Math.min(50, this.value); // Set a maximum initial value of 50
+        drift_offset_sudden_drift.value = initialValue;
+        // Update the output element for drift_offset_sudden_drift
+        var driftOffsetOutput = drift_offset_sudden_drift.nextElementSibling;
+        driftOffsetOutput.textContent = initialValue;
     });
 
     number_of_windows_incremental_drift.addEventListener("input", function() {
         var outputElement = this.nextElementSibling; // Get the <output> element for this input
         outputElement.textContent = this.value; // Update the <output> element with the current value
         validateForm(); // Call your validation function (if needed)
+
+        // Update the max attribute of drift_offset_sudden_drift
+        drift_offset_sudden_drift.max = this.value;
+
+        var initialValue = Math.min(50, this.value); // Set a maximum initial value of 50
+        drift_offset_incremental_drift.value = initialValue;
+
+        var driftOffsetOutput = drift_offset_incremental_drift.nextElementSibling;
+        driftOffsetOutput.textContent = initialValue;
     });
 
     number_of_windows_periodic_drift.addEventListener("input", function() {
@@ -240,6 +262,24 @@
     });
 
     drift_percentage_sudden_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    drift_offset_incremental_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    drift_percentage_incremental_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    drift_increasing_percentage_incremental_drift.addEventListener("input", function() {
         var outputElement = this.nextElementSibling; // Get the <output> element for this input
         outputElement.textContent = this.value; // Update the <output> element with the current value
         validateForm(); // Call your validation function (if needed)
@@ -301,6 +341,17 @@
             submitButton.setAttribute("disabled", "disabled");
         }
     }
+
+    /*
+        document.getElementById('submitButton').addEventListener('click', function () {
+            // Specify the URL of your Flask route that serves the Plotly chart
+            var chartUrl = '/drift_lens_monitor';  // Correct route URL
+
+            // Open a new window with the specified URL
+            var newWindow = window.open(chartUrl, '_blank');
+            newWindow.focus();
+        });*/
+
     </script>
 {% endblock %}
 {% include "footer.html" %}

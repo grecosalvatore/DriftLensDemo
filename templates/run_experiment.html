@@ -1,0 +1,26 @@
+{% include "header.html" %}
+
+{% block content %}
+    <h1>Running Experiment</h1>
+    <p id="experiment-info">
+        Dataset: <span id="dataset"></span><br>
+        Model: <span id="model"></span><br>
+        Drift Pattern: {{ selected_drift_pattern }}
+    </p>
+    <div id="loading-spinner" style="display: none;">
+        <!-- Add your loading spinner or image here -->
+    </div>
+
+    <script>
+        // Get the dataset and model from URL parameters
+        var urlParams = new URLSearchParams(window.location.search);
+        var dataset = urlParams.get("dataset");
+        var model = urlParams.get("model");
+
+        // Display the values on the page
+        document.getElementById("dataset").textContent = dataset;
+        document.getElementById("model").textContent = model;
+    </script>
+{% endblock %}
+
+{% include "footer.html" %}

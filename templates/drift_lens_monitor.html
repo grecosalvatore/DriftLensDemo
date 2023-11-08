@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drift Lens Monitor</title>
+    <!-- Include Plotly.js for rendering the chart -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Drift Lens Monitor</h1>
+
+    <!-- Place to render the Plotly chart -->
+    <div id="plotly-chart"></div>
+
+    <script>
+        // JavaScript code to display the Plotly chart
+        var chartData = {{ plotly_chart|tojson|safe }};
+        var chartDiv = document.getElementById('plotly-chart');
+
+        Plotly.newPlot(chartDiv, chartData);
+    </script>
+</body>
+</html>

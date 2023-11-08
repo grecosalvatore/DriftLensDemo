@@ -1,0 +1,56 @@
+{% include "header.html" %}
+
+{% block content %}
+    <h1>Choose a Dataset and Model</h1>
+
+    <form action="/process_selection" method="POST">
+        <label for="dataset">Select a Dataset:</label>
+        <select id="dataset" name="dataset">
+            {% for dataset in datasets %}
+            <option value="{{ dataset['name'] }}">{{ dataset['name'] }}</option>
+            {% endfor %}
+        </select>
+
+        <br>
+
+        <label for="model">Select a Model:</label>
+        <select id="model" name="model">
+            <option value="" disabled selected>Select a Model</option>
+        </select>
+
+        <br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        // JavaScript code to dynamically update the model dropdown based on the selected dataset
+        var datasetDropdown = document.getElementById("dataset");
+        var modelDropdown = document.getElementById("model");
+
+        // Convert the datasets variable from JSON format
+        var datasets = JSON.parse('{{ datasets|tojson|safe }}');
+
+        datasetDropdown.addEventListener("change", function() {
+            // Clear existing options in the model dropdown
+            modelDropdown.innerHTML = "<option value='' disabled selected>Select a Model</option>";
+
+            // Get the selected dataset
+            var selectedDataset = datasetDropdown.value;
+
+            // Find models for the selected dataset
+            var selectedDatasetModels = datasets.find(function(dataset) {
+                return dataset.name === selectedDataset;
+            }).models;
+
+            // Populate the model dropdown with options for the selected dataset
+            selectedDatasetModels.forEach(function(model) {
+                var option = document.createElement("option");
+                option.value = model;
+                option.text = model;
+                modelDropdown.appendChild(option);
+            });
+        });
+    </script>
+
+{% endblock %}

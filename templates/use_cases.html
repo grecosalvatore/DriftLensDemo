@@ -14,7 +14,7 @@
         <br>
 
         <!-- Display the description content -->
-        <p id="description"></p>  <!-- New paragraph element to display the description -->
+        <p id="description"></p>
 
         <label for="model">Select a Model:</label>
         <select id="model" name="model">
@@ -40,18 +40,84 @@
         </select>
         <br>
         <br>
-        <input type="submit" value="Submit" id="submit-button" disabled> <!-- Add the "Submit" button with disabled attribute -->
+        <!-- Component for selecting the number of windows -->
+        <div id="no-drift-options" style="display: none;">
+            <label for="number_of_windows_no_drift">Number of windows:</label>
+            <input type="range" id="number_of_windows_no_drift" name="number_of_windows_no_drift" min="10" max="1000" step="10" value="100">
+            <output for="number_of_windows_no_drift">100</output>
+        </div>
+
+        <!-- Additional elements for Sudden Drift (Number of Windows, Drift Offset, and Drift Percentage) -->
+        <div id="sudden-drift-options" style="display: none;">
+            <label for="number_of_windows_sudden_drift">Number of Windows:</label>
+            <input type="range" id="number_of_windows_sudden_drift" name="number_of_windows_sudden_drift" min="10" max="1000" step="10" value="100">
+            <output for="number_of_windows_sudden_drift">100</output>
+            <br>
+            <label for="drift_offset_sudden_drift">Drift Starting Offset:</label>
+            <input type="range" id="drift_offset_sudden_drift" name="drift_offset_sudden_drift" min="10" max="1000" step="10" value="50">
+            <output for="drift_offset_sudden_drift">50</output>
+            <br>
+            <label for="drift_percentage_sudden_drift">Drift Percentage:</label>
+            <input type="range" id="drift_percentage_sudden_drift" name="drift_percentage_sudden_drift" min="1" max="100" step="1" value="20">
+            <output for="drift_percentage_sudden_drift">20</output>
+        </div>
+
+        <!-- ... Additional elements for Incremental Drift and Periodic Drift ... -->
+                <!-- Additional elements for Sudden Drift (Number of Windows, Drift Offset, and Drift Percentage) -->
+        <div id="incremental-drift-options" style="display: none;">
+            <label for="number_of_windows_incremental_drift">Number of Windows:</label>
+            <input type="range" id="number_of_windows_incremental_drift" name="number_of_windows_incremental_drift" min="10" max="1000" step="10" value="100">
+            <output for="number_of_windows_incremental_drift">100</output>
+            <br>
+            <label for="drift_offset_incremental_drift">Drift Starting Offset:</label>
+            <input type="range" id="drift_offset_incremental_drift" name="drift_offset_incremental_drift" min="10" max="1000" step="10" value="50">
+            <output for="drift_offset_incremental_drift">50</output>
+            <br>
+            <label for="drift_percentage_incremental_drift">Drift Starting Percentage:</label>
+            <input type="range" id="drift_percentage_incremental_drift" name="drift_percentage_incremental_drift" min="1" max="100" step="1" value="20">
+            <output for="drift_percentage_incremental_drift">20</output>
+            <br>
+            <label for="drift_increasing_percentage_incremental_drift">Drift Increasing Percentage:</label>
+            <input type="range" id="drift_increasing_percentage_incremental_drift" name="drift_increasing_percentage_incremental_drift" min="1" max="100" step="1" value="20">
+            <output for="drift_increasing_percentage_incremental_drift">20</output>
+        </div>
+
+        <div id="periodic-drift-options" style="display: none;">
+            <label for="number_of_windows_periodic_drift">Number of Windows:</label>
+            <input type="range" id="number_of_windows_periodic_drift" name="number_of_windows_periodic_drift" min="10" max="1000" step="10" value="100">
+            <output for="number_of_windows_periodic_drift">100</output>
+            <br>
+            <label for="drift_offset_periodic_drift">Drift Offset:</label>
+            <input type="range" id="drift_offset_periodic_drift" name="drift_offset_periodic_drift" min="10" max="1000" step="10" value="50">
+            <output for="drift_offset_periodic_drift">50</output>
+            <br>
+            <label for="drift_percentage_periodic_drift">Drift Percentage:</label>
+            <input type="range" id="drift_percentage_periodic_drift" name="drift_percentage_periodic_drift" min="1" max="100" step="1" value="20">
+            <output for="drift_percentage_periodic_drift">20</output>
+        </div>
+
+        <br>
+        <br>
+        <input type="submit" value="Submit" id="submit-button" disabled>
     </form>
 
     <script>
-    // JavaScript code to dynamically update the model dropdown, window size dropdown,
-    // and display the description based on the selected dataset
     var datasetDropdown = document.getElementById("dataset");
     var modelDropdown = document.getElementById("model");
-    var descriptionElement = document.getElementById("description"); // Added description element
-    var windowSizeDropdown = document.getElementById("window_size"); // Added window size dropdown
+    var descriptionElement = document.getElementById("description");
+    var windowSizeDropdown = document.getElementById("window_size");
     var driftPatternDropdown = document.getElementById("drift_pattern");
-    var submitButton = document.getElementById("submit-button"); // Added submit button element
+    var submitButton = document.getElementById("submit-button");
+    var noDriftOptions = document.getElementById("no-drift-options");
+    var suddenDriftOptions = document.getElementById("sudden-drift-options");
+    var incrementalDriftOptions = document.getElementById("incremental-drift-options");
+    var periodicDriftOptions = document.getElementById("periodic-drift-options");
+    var number_of_windows_no_drift = document.getElementById("number_of_windows_no_drift");
+    var number_of_windows_sudden_drift = document.getElementById("number_of_windows_sudden_drift");
+    var number_of_windows_incremental_drift = document.getElementById("number_of_windows_incremental_drift");
+    var number_of_windows_periodic_drift = document.getElementById("number_of_windows_periodic_drift");
+    var drift_offset_sudden_drift = document.getElementById("drift_offset_sudden_drift");
+    var drift_percentage_sudden_drift = document.getElementById("drift_percentage_sudden_drift");
 
     // Convert the datasets variable from JSON format
     var datasets = JSON.parse('{{ data|tojson|safe }}');
@@ -61,21 +127,18 @@
         modelDropdown.innerHTML = "<option value='' disabled selected>Select a Model</option>";
         windowSizeDropdown.innerHTML = "<option value='' disabled selected>Select a Window Size</option>";
 
-        driftPatternDropdown.selectedIndex = 0; // Reset the drift pattern selection
-        driftPatternDropdown.setAttribute("disabled", "disabled"); // Disable the drift pattern dropdown
-
-        windowSizeDropdown.selectedIndex = 0; // Reset the window size selection
-        windowSizeDropdown.setAttribute("disabled", "disabled"); // Disable the window size dropdown
+        // Reset drift pattern selection and hide additional options
+        driftPatternDropdown.selectedIndex = 0;
+        driftPatternDropdown.setAttribute("disabled", "disabled");
+        hideAdditionalOptions();
 
         // Get the selected dataset
         var selectedDataset = datasetDropdown.value;
 
-        // Find models for the selected dataset
         var selectedDatasetModels = datasets.find(function(dataset) {
             return dataset.name === selectedDataset;
         }).models;
 
-        // Populate the model dropdown with options for the selected dataset
         selectedDatasetModels.forEach(function(model) {
             var option = document.createElement("option");
             option.value = model.name;
@@ -83,18 +146,14 @@
             modelDropdown.appendChild(option);
         });
 
-        // Load and display the description from a file
         loadDatasetDescription(selectedDataset);
     });
 
     modelDropdown.addEventListener("change", function() {
-        // Enable the window size dropdown when a model is selected
         var selectedModel = modelDropdown.value;
         if (selectedModel) {
-            // Get the selected dataset
             var selectedDataset = datasetDropdown.value;
 
-            // Find window sizes for the selected dataset and model
             var selectedDatasetModels = datasets.find(function(dataset) {
                 return dataset.name === selectedDataset;
             }).models;
@@ -104,17 +163,16 @@
             });
 
             if (selectedModelInfo && selectedModelInfo.window_sizes) {
-                // Populate the window size dropdown with options for the selected dataset and model
                 selectedModelInfo.window_sizes.forEach(function(windowSize) {
                     var option = document.createElement("option");
                     option.value = windowSize;
                     option.text = windowSize;
                     windowSizeDropdown.appendChild(option);
                 });
-                // Enable the window size dropdown
                 windowSizeDropdown.removeAttribute("disabled");
             }
         }
+
         // Enable the drift pattern dropdown when both dataset and model are selected
         enableDriftPatternDropdown();
     });
@@ -128,21 +186,79 @@
     }
 
     windowSizeDropdown.addEventListener("change", function() {
-        // Validate the form before enabling the "Submit" button
         validateForm();
     });
 
     driftPatternDropdown.addEventListener("change", function() {
+        var selectedDriftPattern = driftPatternDropdown.value;
+
+        // Hide or show the additional options based on the selected drift pattern
+        hideAdditionalOptions();
+
+        if (selectedDriftPattern === "no_drift") {
+            noDriftOptions.style.display = "block";
+        } else if (selectedDriftPattern === "sudden_drift") {
+            suddenDriftOptions.style.display = "block";
+        } else if (selectedDriftPattern === "incremental_drift") {
+            incrementalDriftOptions.style.display = "block";
+        } else if (selectedDriftPattern === "periodic_drift") {
+            periodicDriftOptions.style.display = "block";
+        }
+
         validateForm();
     });
 
-    // Function to load and display the dataset description from a file
+    number_of_windows_no_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+
+    number_of_windows_sudden_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    number_of_windows_incremental_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    number_of_windows_periodic_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    drift_offset_sudden_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    drift_percentage_sudden_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    // Additional input validation and event listeners for other drift patterns (Incremental Drift, Periodic Drift) can be added similarly.
+
+    function hideAdditionalOptions() {
+        noDriftOptions.style.display = "none";
+        suddenDriftOptions.style.display = "none";
+        incrementalDriftOptions.style.display = "none";
+        periodicDriftOptions.style.display = "none";
+        // Hide other additional options here when implemented.
+    }
+
     function loadDatasetDescription(datasetName) {
-        // Encode the dataset name for the URL
         var encodedDatasetName = encodeURIComponent(datasetName);
 
         var descriptionFile = `/static/use_cases/datasets/${encodedDatasetName}/description.txt`;
-        console.log('Description file path:', descriptionFile);
         var xhr = new XMLHttpRequest();
         xhr.open("GET", descriptionFile, true);
         xhr.onreadystatechange = function() {
@@ -158,22 +274,33 @@
         };
     }
 
-    // Function to validate the form and enable the "Submit" button
     function validateForm() {
         var selectedModel = modelDropdown.value;
         var selectedDataset = datasetDropdown.value;
         var selectedDriftPattern = driftPatternDropdown.value;
-        var selectedWindowSize = windowSizeDropdown.value;
+        //var selectedWindowSize = windowSizeDropdown.value;
 
-        // Check if all required fields are selected
-        if (selectedModel && selectedDataset && selectedDriftPattern && selectedWindowSize) {
+        if (selectedModel && selectedDataset && selectedDriftPattern) {
+            valid = true
+         //   if (selectedDriftPattern === "no_drift") {
+          //      if (selectedWindowSize) {
+                    // Additional validation for No Drift (if needed)
+          //      }
+          //  } else if (selectedDriftPattern === "sudden_drift") {
+          //      if (selectedWindowSize) {
+                    // Additional validation for Sudden Drift
+           //     }
+                // Additional validation for Number of Windows, Drift Offset, and Drift Percentage can be added here.
+           // }
+            // Additional validation for other drift patterns can be added similarly.
+        }
+
+        if (valid) {
             submitButton.removeAttribute("disabled");
         } else {
             submitButton.setAttribute("disabled", "disabled");
         }
     }
     </script>
-
-
 {% endblock %}
 {% include "footer.html" %}

@@ -1,0 +1,2 @@
+Ag News is a topic classification task. The original dataset contains 4 labels: 1, 2, 3, 4.
+The classification model has been trained on 3 classes. Drift is simulated with the arrival of a new class label.

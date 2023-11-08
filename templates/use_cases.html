@@ -1,32 +1,51 @@
 {% include "header.html" %}
 
 {% block content %}
-    <h1>Choose a Dataset and Model</h1>
-
+    <h1>Use Case Selection</h1>
+    <h2>Choose Dataset and Model</h2>
     <form action="/process_selection" method="POST">
         <label for="dataset">Select a Dataset:</label>
         <select id="dataset" name="dataset">
+            <option value="" selected disabled>Select a Dataset</option> <!-- Default option -->
             {% for dataset in datasets %}
             <option value="{{ dataset['name'] }}">{{ dataset['name'] }}</option>
             {% endfor %}
         </select>
 
+
         <br>
+
+        <!-- Display the description content -->
+        <p id="description"></p>  <!-- New paragraph element to display the description -->
 
         <label for="model">Select a Model:</label>
         <select id="model" name="model">
             <option value="" disabled selected>Select a Model</option>
+            <!-- Add the options for the models here -->
         </select>
 
         <br>
-
-        <input type="submit" value="Submit">
+        <br>
+        <h2>Drift Experiment Configuration</h2>
+        <label for="drift_pattern">Select Drift Pattern:</label>
+        <select id="drift_pattern" name="drift_pattern" disabled>
+            <option value="" selected disabled>Select a Drift Pattern</option> <!-- Default option -->
+            <option value="sudden_drift">No Drift</option>
+            <option value="sudden_drift">Sudden Drift</option>
+            <option value="gradual_drift">Incremental Drift</option>
+            <option value="gradual_drift">Periodic Drift</option>
+        </select>
+        <br>
+        <input type="submit" value="Submit" id="submit-button" disabled> <!-- Add the "Submit" button with disabled attribute -->
     </form>
 
     <script>
-        // JavaScript code to dynamically update the model dropdown based on the selected dataset
+        // JavaScript code to dynamically update the model dropdown and display the description based on the selected dataset
         var datasetDropdown = document.getElementById("dataset");
         var modelDropdown = document.getElementById("model");
+        var descriptionElement = document.getElementById("description"); // Added description element
+        var driftPatternDropdown = document.getElementById("drift_pattern");
+        var submitButton = document.getElementById("submit-button"); // Added submit button element
 
         // Convert the datasets variable from JSON format
         var datasets = JSON.parse('{{ datasets|tojson|safe }}');
@@ -34,6 +53,10 @@
         datasetDropdown.addEventListener("change", function() {
             // Clear existing options in the model dropdown
             modelDropdown.innerHTML = "<option value='' disabled selected>Select a Model</option>";
+
+            driftPatternDropdown.selectedIndex = 0; // Reset the drift pattern selection
+            driftPatternDropdown.setAttribute("disabled", "disabled"); // Disable the drift pattern dropdown
+
 
             // Get the selected dataset
             var selectedDataset = datasetDropdown.value;
@@ -50,8 +73,60 @@
                 option.text = model;
                 modelDropdown.appendChild(option);
             });
-        });
-    </script>
 
+            // Load and display the description from a file
+            loadDatasetDescription(selectedDataset);
+        });
+
+        modelDropdown.addEventListener("change", function() {
+            driftPatternDropdown.removeAttribute("disabled"); // Enable the drift pattern dropdown
+            validateForm();
+        });
+
+        driftPatternDropdown.addEventListener("change", function() {
+            validateForm();
+        });
+
+        modelDropdown.addEventListener("change", function() {
+            // Validate the form before enabling the "Submit" button
+            validateForm();
+        });
+
+        // Function to load and display the dataset description from a file
+        function loadDatasetDescription(datasetName) {
+            // Encode the dataset name for the URL
+            var encodedDatasetName = encodeURIComponent(datasetName);
+
+            var descriptionFile = `/static/use_cases/datasets/${encodedDatasetName}/description.txt`;
+            console.log('Description file path:', descriptionFile);
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", descriptionFile, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var descriptionText = xhr.responseText;
+                        descriptionElement.textContent = descriptionText;
+                    } else {
+                        descriptionElement.textContent = "Description not available.";
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        // Function to validate the form and enable the "Submit" button
+        function validateForm() {
+            var selectedModel = modelDropdown.value;
+            var selectedDataset = datasetDropdown.value;
+            var selectedDriftPattern = driftPatternDropdown.value;
+
+            // Check if both the dataset and model are selected
+            if (selectedModel && selectedDataset && selectedDriftPattern) {
+                submitButton.removeAttribute("disabled");
+            } else {
+                submitButton.setAttribute("disabled", "disabled");
+            }
+        }
+    </script>
 {% endblock %}
 {% include "footer.html" %}

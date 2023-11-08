@@ -37,7 +37,7 @@ def plotly_chart():
 
 
 def get_datasets_and_models():
-    base_directory = "use_cases/datasets"
+    base_directory = "static/use_cases/datasets"
     datasets = []
     for dataset_dir in os.listdir(base_directory):
         if os.path.isdir(os.path.join(base_directory, dataset_dir)):
@@ -49,6 +49,8 @@ def get_datasets_and_models():
                         models.append(model_dir)
             datasets.append({"name": dataset_dir, "models": models})
     return datasets
+
+
 
 @app.route("/process_selection", methods=["POST"])
 def process_selection():

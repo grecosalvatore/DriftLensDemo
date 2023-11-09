@@ -16,7 +16,17 @@
         var chartData = {{ plotly_chart|tojson|safe }};
         var chartDiv = document.getElementById('plotly-chart');
 
-        Plotly.newPlot(chartDiv, chartData);
+        function updateChart(newData) {
+            // Update the chart with new data
+            Plotly.update(chartDiv, newData);
+        }
+
+        var source = new EventSource('/drift_lens_monitor');
+
+        source.onmessage = function (event) {
+            var newData = JSON.parse(event.data);
+            updateChart(newData);
+        };
     </script>
 </body>
 </html>

@@ -1,14 +1,15 @@
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from flask import Flask, render_template, request, redirect, url_for, make_response
+from flask import Flask, render_template, request, redirect, url_for, make_response, Response
 import plotly.express as px
 import time
 import webbrowser
 import h5py
 import numpy as np
 from windows_manager.windows_generator import WindowsGenerator
-
+import json
+import random
 
 app = Flask(__name__)
 
@@ -76,17 +77,31 @@ def upload():
     return render_template('upload.html', title=title)
 
 @app.route("/drift_lens_monitor")
-def plotly_chart():
-    # Create or retrieve data for your Plotly chart
-    data = [1, 2, 3, 4, 5]
+def drift_lens_monitor():
+    # ... (your existing code)
 
-    # Create the Plotly chart
-    fig = px.line(x=list(range(1, len(data) + 1)), y=data, title='Your Plotly Chart')
+    form_parameters_str = request.args.get("form_params")
+    print("Drift Lens Monitor: ", form_parameters_str)
+    print(type(form_parameters_str))
+    # Replace single quotes with double quotes
+    form_parameters_str = form_parameters_str.replace("'", "\"")
+    form_parameters = json.loads(form_parameters_str)
+    time.sleep(20)
+    selected_dataset = form_parameters['dataset']
+    selected_model = form_parameters['model']
+    selected_window_size = int(form_parameters['window_size'])
+    selected_drift_pattern = form_parameters['drift_pattern']
 
-    # Generate HTML for the Plotly chart
-    plotly_chart_div = fig.to_html(full_html=False)
 
-    return render_template('drift_lens_monitor.html', plotly_chart=plotly_chart_div)
+    def generate_chart_updates():
+        while True:
+            # Replace this with your logic to generate new data for the chart
+            new_data = [random.randint(1, 10) for _ in range(10)]
+            yield f"data: {json.dumps(new_data)}\n\n"
+            time.sleep(1)  # Adjust the sleep time as needed
+
+    return Response(generate_chart_updates(), content_type='text/event-stream')
+
 
 
 @app.route("/run_experiment", methods=["GET", "POST"])
@@ -101,6 +116,7 @@ def run_experiment():
         selected_model = request.form.get("model")
         selected_window_size = int(request.form.get("window_size"))
         selected_drift_pattern = request.form.get("drift_pattern")
+        all_parameters = request.form.to_dict()
 
         # Load Embedding
         new_unseen_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/new_unseen_embedding.hdf5"
@@ -181,22 +197,19 @@ def run_experiment():
         <script>
             if (!window.alreadyOpened) {
                 // Open a new window with drift_lens_monitor
-                var newWindow = window.open("/drift_lens_monitor", "_blank");
+                var newWindow = window.open("/drift_lens_monitor?form_params=%s", "_blank");
                 newWindow.focus();
 
                 // Delay the redirection by a few milliseconds to ensure the new window has opened
                 setTimeout(function() {
-                    // Redirect the current window to /run_experiment with query parameters
-                    var dataset = "%s";  // Note the use of placeholders here
-                    var model = "%s";
-                    var drift_pattern = "%s";
-                    window.location.href = "/run_experiment?dataset=" + dataset + "&model=" + model + "&drift_pattern=" + drift_pattern;
+                    // Redirect the current window to /run_experiment
+                    window.location.href = "/run_experiment";
                 }, 100); // You can adjust the delay in milliseconds if needed
 
                 window.alreadyOpened = true; // Set a flag to indicate that the new window is opened
             }
         </script>
-        """ % (selected_dataset, selected_model, selected_drift_pattern)
+        """ % (all_parameters)
 
         response = make_response(
             f"dataset={selected_dataset}, Selected Model: {selected_model}, Selected Window Size: {selected_window_size}, Selected Drift Pattern: {selected_drift_pattern} {script}")

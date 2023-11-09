@@ -1,7 +1,148 @@
 {% include "header.html" %}
 
 {% block content %}
-    <h1>Use Case Selection</h1>
+    <style>
+        table {
+          font-family: Arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+          margin-bottom: 20px;
+        }
+
+        th, td {
+
+          padding: 8px;
+          text-align: left;
+        }
+
+        th {
+          background-color: #f2f2f2;
+        }
+
+        tr.separator {
+          height: 10px;
+          background-color: #ddd;
+        }
+  </style>
+
+
+<h1>Use Case Selection</h1>
+
+    <table>
+  <caption>Pre-uploaded use cases.</caption>
+  <thead>
+    <tr>
+      <th>Use Case</th>
+      <th rowspan="3">Dataset</th>
+      <th rowspan="3">Domain</th>
+      <th>Models</th>
+      <th>F1</th>
+      <th rowspan="3">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1.1</td>
+      <td rowspan="3">Ag News</td>
+      <td rowspan="3">Text</td>
+      <td>BERT</td>
+      <td>0.98</td>
+      <td rowspan="3"> Task: Topic Classification. <BR>
+Training Labels: World, Business, and Sport <BR>
+Drift: Simulated with one new class label: Science/Tech</td>
+    </tr>
+    <tr>
+      <td>1.2</td>
+      <td>DistillBERT</td>
+      <td>0.97</td>
+    </tr>
+    <tr>
+      <td>1.3</td>
+      <td>RoBERTa</td>
+      <td>0.98</td>
+    </tr>
+    <tr class="separator">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  <tr>
+      <td>2.1</td>
+      <td rowspan="3">20 Newsgroup</td>
+      <td rowspan="3">Text</td>
+      <td>BERT</td>
+      <td>0.88</td>
+      <td rowspan="3"></td>
+    </tr>
+    <tr>
+      <td>2.2</td>
+      <td>DistillBERT</td>
+      <td>0.87</td>
+    </tr>
+    <tr>
+      <td>2.3</td>
+      <td>RoBERTa</td>
+      <td>0.88</td>
+    </tr>
+    <tr class="separator">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  <tr>
+      <td>3.1</td>
+      <td rowspan="2">STL</td>
+      <td rowspan="2">Computer Vision</td>
+      <td>VGG16</td>
+      <td>??</td>
+      <td rowspan="2"></td>
+    </tr>
+    <tr>
+      <td>3.2</td>
+      <td>VisionTransformer</td>
+      <td>??</td>
+    </tr>
+    <tr class="separator">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  <tr>
+      <td>4.1</td>
+      <td rowspan="2">STL</td>
+      <td rowspan="2">Computer Vision</td>
+      <td>VGG16</td>
+      <td>??</td>
+      <td rowspan="2"></td>
+    </tr>
+    <tr>
+      <td>4.2</td>
+      <td>VisionTransformer</td>
+      <td>??</td>
+    </tr>
+    <tr class="separator">
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
     <h2>Choose Dataset and Model</h2>
     <form action="/run_experiment" method="POST">
         <label for="dataset">Select a Dataset:</label>

@@ -1,6 +1,6 @@
 # Drift Lens Demo
 
-Drift Lens is an unsupervised drift detection framework for deep learning classifiers on unstructured data.
+*DriftLens* is an **unsupervised drift detection** framework for deep learning classifiers on unstructured data.
 It performs distribution distances between a historical dataset, called baseline, and a new data stream divided in fixed-sized windows.
 
 # Table of Contents

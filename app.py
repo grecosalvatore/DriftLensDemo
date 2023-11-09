@@ -173,7 +173,7 @@ def run_experiment():
             print("periodic drift")
 
 
-        for E_win in E_windows:
+        #for E_win in E_windows:
             # Do something and update plot
 
         # JavaScript to open a new window and redirect the current window
@@ -189,13 +189,14 @@ def run_experiment():
                     // Redirect the current window to /run_experiment with query parameters
                     var dataset = "%s";  // Note the use of placeholders here
                     var model = "%s";
-                    window.location.href = "/run_experiment?dataset=" + dataset + "&model=" + model;
+                    var drift_pattern = "%s";
+                    window.location.href = "/run_experiment?dataset=" + dataset + "&model=" + model + "&drift_pattern=" + drift_pattern;
                 }, 100); // You can adjust the delay in milliseconds if needed
 
                 window.alreadyOpened = true; // Set a flag to indicate that the new window is opened
             }
         </script>
-        """ % (selected_dataset, selected_model)
+        """ % (selected_dataset, selected_model, selected_drift_pattern)
 
         response = make_response(
             f"dataset={selected_dataset}, Selected Model: {selected_model}, Selected Window Size: {selected_window_size}, Selected Drift Pattern: {selected_drift_pattern} {script}")

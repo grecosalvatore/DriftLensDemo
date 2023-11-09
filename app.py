@@ -3,6 +3,7 @@ import plotly.express as px
 import os
 import time
 import webbrowser
+import h5py
 
 app = Flask(__name__)
 
@@ -33,6 +34,25 @@ def get_datasets_models_and_window_sizes():
             datasets.append({"name": dataset_dir, "models": models})
 
     return datasets
+
+def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name=None):
+    if filepath is not None:
+        with h5py.File(filepath, "r") as hf:
+            if E_name is None:
+                E = hf["E"][()]
+            else:
+                E = hf[E_name][()]
+            if Y_original_name is None:
+                Y_original = hf["Y_original"][()]
+            else:
+                Y_original = hf[Y_original_name][()]
+            if Y_predicted_name is None:
+                Y_predicted = hf["Y_predicted"][()]
+            else:
+                Y_predicted = hf[Y_predicted_name][()]
+    else:
+        raise Exception("Experiment Manager: Error in loading the embedding file. Please set the embedding paths in the configuration file.")
+    return E, Y_original, Y_predicted
 
 @app.route("/")
 def home():
@@ -77,16 +97,47 @@ def run_experiment():
         selected_window_size = request.form.get("window_size")
         selected_drift_pattern = request.form.get("drift_pattern")
 
+        # Load Embedding
+        new_unseen_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/new_unseen_embedding.hdf5"
+        drifted_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/drifted_embedding.hdf5"
+
+
         if selected_drift_pattern == "no_drift":
             print("no drift")
+            selected_number_of_windows = request.form.get("number_of_windows_no_drift")
+            print(selected_number_of_windows)
+            E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
         elif selected_drift_pattern == "sudden_drift":
             print("sudden drift")
+            selected_number_of_windows = request.form.get("number_of_windows_sudden_drift")
+            selected_drift_offset = request.form.get("drift_offset_sudden_drift")
+            selected_drift_percentage = request.form.get("drift_percentage_sudden_drift")
+            print(selected_number_of_windows)
+            print(selected_drift_offset)
+            print(selected_drift_percentage)
+            E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
+            E_drift, Y_original_drift, Y_predicted_drift = load_embedding(drifted_embedding_path)
+
         elif selected_drift_pattern == "incremental_drift":
             print("incremental drift")
+            selected_number_of_windows = request.form.get("number_of_windows_incremental_drift")
+            selected_drift_offset = request.form.get("drift_offset_incremental_drift")
+            selected_starting_drift_percentage = request.form.get("drift_percentage_incremental_drift")
+            selected_increasing_drift_percentage = request.form.get("drift_increasing_percentage_incremental_drift")
+            print(selected_number_of_windows)
+            print(selected_drift_offset)
+            print(selected_starting_drift_percentage)
+            print(selected_increasing_drift_percentage)
+
+            E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
+            E_drift, Y_original_drift, Y_predicted_drift = load_embedding(drifted_embedding_path)
         if selected_drift_pattern == "periodic_drift":
             print("periodic drift")
 
-        # JavaScript to open a new window and redirect the current window
+            E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
+            E_drift, Y_original_drift, Y_predicted_drift = load_embedding(drifted_embedding_path)
+
+
         # JavaScript to open a new window and redirect the current window
         script = """
         <script>

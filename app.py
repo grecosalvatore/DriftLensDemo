@@ -186,9 +186,11 @@ def drift_lens_monitor():
     def generate_chart_updates():
         for i, (E_w, y_pred, y_true) in enumerate(zip(E_windows, Y_predicted_windows, Y_original_windows)):
             window_distance = dl.compute_window_distribution_distances(E_w, y_pred)
-            window_distance["batch"] = _utils.clear_complex_number(window_distance["batch"])
+            if type(window_distance["batch"]) == "str":
+                window_distance["batch"] = float(_utils.clear_complex_number(window_distance["batch"]).real)
             for l in training_label_list:
-                window_distance["per-label"][str(l)] = _utils.clear_complex_number(window_distance["per-label"][str(l)])
+                if type( window_distance["per-label"][str(l)]) == "str":
+                    window_distance["per-label"][str(l)] = float(_utils.clear_complex_number(window_distance["per-label"][str(l)]).real)
             print(f"window: {i} - {window_distance}")
             yield f"data: {json.dumps(window_distance)}\n\n"
             time.sleep(1)  # Adjust the sleep time as needed

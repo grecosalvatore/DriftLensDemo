@@ -1,32 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Drift Lens Monitor</title>
-    <!-- Include Plotly.js for rendering the chart -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-</head>
-<body>
-    <h1>Drift Lens Monitor</h1>
+{% include "header.html" %}
 
-    <!-- Place to render the Plotly chart -->
-    <div id="plotly-chart"></div>
 
-    <script>
-        // JavaScript code to display the Plotly chart
-        var chartData = {{ plotly_chart|tojson|safe }};
-        var chartDiv = document.getElementById('plotly-chart');
+{% block content %}
+  <body>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/app.js') }}"></script>
 
-        function updateChart(newData) {
-            // Update the chart with new data
-            Plotly.update(chartDiv, newData);
-        }
+    <div class="container">
+      <div class="hero">
+        <h1>Per-Batch Drift Detection</h1>
+        <div class="chart-container">
+          <canvas id="myChart" width="1000" height="400"></canvas>
+        </div>
+        <h1>Per-Label Drift Detection</h1>
+        <div id="num_labels" data-num-labels="{{ num_labels }}"></div>
+        <div id="label_names" data-label-names="{{ label_names }}"></div>
+        <div class="chart-container">
+          <canvas id="myChart_per_label" width="1000" height="400"></canvas>
+        </div>
+      </div>
+    </div>
+  </body>
+{% endblock %}
 
-        var source = new EventSource('/drift_lens_monitor');
-
-        source.onmessage = function (event) {
-            var newData = JSON.parse(event.data);
-            updateChart(newData);
-        };
-    </script>
-</body>
-</html>
+{% include "footer.html" %}

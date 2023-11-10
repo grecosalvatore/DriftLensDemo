@@ -14,18 +14,7 @@
         </ul>
     </p>
 
-    <button id="runButton">Run</button>
 
-    <script>
-        document.getElementById('runButton').addEventListener('click', function () {
-            // Specify the URL of your Flask route that serves the Plotly chart
-            var chartUrl = '/drift_lens_monitor';  // Correct route URL
-
-            // Open a new window with the specified URL
-            var newWindow = window.open(chartUrl, '_blank');
-            newWindow.focus();
-        });
-    </script>
 {% endblock %}
 
 {% include "footer.html" %}

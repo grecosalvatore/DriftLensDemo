@@ -1,19 +1,30 @@
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from flask import Flask, render_template, request, redirect, url_for, make_response, Response
-import plotly.express as px
-import time
-import webbrowser
-import h5py
-import numpy as np
+from flask import Flask, render_template, request
+from flask_socketio import SocketIO
+from random import random
+from threading import Lock
+from datetime import datetime
 from windows_manager.windows_generator import WindowsGenerator
-import json
-import random
 from drift_lens.drift_lens import DriftLens
 from utils import _utils
+import h5py
+import json
+import os
+"""
+Background Thread
+"""
+thread = None
+thread_lock = Lock()
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'donsky!'
+socketio = SocketIO(app, cors_allowed_origins='*')
+
+"""
+Get current date time
+"""
+def get_current_datetime():
+    now = datetime.now()
+    return now.strftime("%m/%d/%Y %H:%M:%S")
 
 def get_datasets_models_and_window_sizes():
     base_directory = "static/use_cases/datasets"
@@ -43,6 +54,22 @@ def get_datasets_models_and_window_sizes():
 
     return datasets
 
+"""
+Generate random sequence of dummy sensor values and send it to our clients
+"""
+def background_thread():
+    print("Generating random sensor values")
+    while True:
+        dummy_sensor_value = round(random() * 100, 3)
+        socketio.emit('updateSensorData', {'value': dummy_sensor_value, "date": get_current_datetime()})
+        socketio.sleep(1)
+
+@app.route("/use_cases")
+def use_cases():
+    title = 'DriftLens'
+    available_data = get_datasets_models_and_window_sizes()
+    return render_template('use_cases.html', title=title, data=available_data)
+
 def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name=None):
     if filepath is not None:
         with h5py.File(filepath, "r") as hf:
@@ -62,33 +89,10 @@ def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name
         raise Exception("Experiment Manager: Error in loading the embedding file. Please set the embedding paths in the configuration file.")
     return E, Y_original, Y_predicted
 
-@app.route("/")
-def home():
-    title = 'DriftLens'
-    return render_template('home.html', title=title)
-
-@app.route("/use_cases")
-def use_cases():
-    title = 'DriftLens'
-    available_data = get_datasets_models_and_window_sizes()
-    return render_template('use_cases.html', title=title, data=available_data)
-
-@app.route("/upload")
-def upload():
-    title = 'DriftLens'
-    return render_template('upload.html', title=title)
-
-@app.route("/drift_lens_monitor")
-def drift_lens_monitor():
-    # ... (your existing code)
-
-    form_parameters_str = request.args.get("form_params")
-    print("Drift Lens Monitor: ", form_parameters_str)
-    print(type(form_parameters_str))
-    # Replace single quotes with double quotes
-    form_parameters_str = form_parameters_str.replace("'", "\"")
-    form_parameters = json.loads(form_parameters_str)
-    time.sleep(20)
+def run_drift_detection_background_thread(form_parameters):
+    print("\n\n")
+    print("drift_lens_monitor Reciving")
+    print("\n\n")
     selected_dataset = form_parameters['dataset']
     selected_model = form_parameters['model']
     selected_window_size = int(form_parameters['window_size'])
@@ -144,9 +148,6 @@ def drift_lens_monitor():
             drift_offset=selected_drift_offset,
             flag_shuffle=flag_shuffle,
             flag_replacement=flag_replacement)
-        for i, y in enumerate(Y_original_windows):
-            count_n = np.sum(y == 3)
-            print(f"window: {i} - {count_n}")
 
     elif selected_drift_pattern == "incremental_drift":
         print("incremental drift")
@@ -154,10 +155,6 @@ def drift_lens_monitor():
         selected_drift_offset = int(form_parameters["drift_offset_incremental_drift"])
         selected_starting_drift_percentage = int(form_parameters["drift_percentage_incremental_drift"]) / 100
         selected_increasing_drift_percentage = int(form_parameters["drift_increasing_percentage_incremental_drift"]) / 100
-
-        print(selected_starting_drift_percentage)
-        print(selected_increasing_drift_percentage)
-
 
         E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_incremental_drift_windows_generation(
             window_size=selected_window_size,
@@ -168,82 +165,72 @@ def drift_lens_monitor():
             flag_shuffle=flag_shuffle,
             flag_replacement=flag_replacement)
 
-        for i, y in enumerate(Y_original_windows):
-            count_n = np.sum(y == 3)
-            print(f"window: {i} - {count_n}")
 
     if selected_drift_pattern == "periodic_drift":
         print("periodic drift")
 
+    for i, (E_w, y_pred, y_true) in enumerate(zip(E_windows, Y_predicted_windows, Y_original_windows)):
+        window_distance = dl.compute_window_distribution_distances(E_w, y_pred)
+        window_distance["window_id"] = i
+        if isinstance(window_distance["batch"], complex):
+            window_distance["batch"] = float(_utils.clear_complex_number(window_distance["batch"]).real)
+        for l in training_label_list:
+            if isinstance(window_distance["per-label"][str(l)], complex):
+                print("clearing:", window_distance["per-label"][str(l)])
+                window_distance["per-label"][str(l)] = float(_utils.clear_complex_number(window_distance["per-label"][str(l)]).real)
+                print(window_distance["per-label"][str(l)])
+        print(f"window: {i} - {window_distance}")
 
-    """def generate_chart_updates():
-        while True:
-            # Replace this with your logic to generate new data for the chart
-            new_data = [random.randint(1, 10) for _ in range(10)]
-            yield f"data: {json.dumps(new_data)}\n\n"
-            time.sleep(1)  # Adjust the sleep time as needed"""
+        per_label_distances = ",".join(str(v) for k,v in window_distance["per-label"].items())
+        #yield f"data: {json.dumps(window_distance)}\n\n"
+        print(window_distance["per-label"])
+        socketio.emit('updateSensorData', {'batch_distance': window_distance["batch"], "per_label_distances":per_label_distances , "date": get_current_datetime()})
+        socketio.sleep(0)
 
-    def generate_chart_updates():
-        for i, (E_w, y_pred, y_true) in enumerate(zip(E_windows, Y_predicted_windows, Y_original_windows)):
-            window_distance = dl.compute_window_distribution_distances(E_w, y_pred)
-            window_distance["window_id"] = i
-            if isinstance(window_distance["batch"], complex):
-                window_distance["batch"] = float(_utils.clear_complex_number(window_distance["batch"]).real)
-            for l in training_label_list:
-                if isinstance(window_distance["per-label"][str(l)], complex):
-                    print("clearing :", window_distance["per-label"][str(l)])
-                    window_distance["per-label"][str(l)] = float(_utils.clear_complex_number(window_distance["per-label"][str(l)]).real)
-                    print(window_distance["per-label"][str(l)])
-            print(f"window: {i} - {window_distance}")
-            yield f"data: {json.dumps(window_distance)}\n\n"
-            time.sleep(1)  # Adjust the sleep time as needed
+@app.route("/drift_lens_monitor", methods=["GET", "POST"])
+def drift_lens_monitor():
+    title = 'DriftLens'
 
-    return Response(generate_chart_updates(), content_type='text/event-stream')
-
-
-
-@app.route("/run_experiment", methods=["GET", "POST"])
-def run_experiment():
-    selected_dataset = ""
-    selected_model = ""
-    selected_window_size = ""
-    selected_drift_pattern = ""
     if request.method == "POST":
-        # This block should execute only when the form is submitted via POST
-        selected_dataset = request.form.get("dataset")
-        selected_model = request.form.get("model")
-        selected_window_size = int(request.form.get("window_size"))
-        selected_drift_pattern = request.form.get("drift_pattern")
         all_parameters = request.form.to_dict()
+    global thread
+    print('Client connected')
 
-        # JavaScript to open a new window and redirect the current window
-        script = """
-        <script>
-            if (!window.alreadyOpened) {
-                // Open a new window with drift_lens_monitor
-                var newWindow = window.open("/drift_lens_monitor?form_params=%s", "_blank");
-                newWindow.focus();
+    global thread
+    with thread_lock:
+        if thread is None:
+            #thread = socketio.start_background_task(background_thread)
+            thread = socketio.start_background_task(run_drift_detection_background_thread, all_parameters)
 
-                // Delay the redirection by a few milliseconds to ensure the new window has opened
-                setTimeout(function() {
-                    // Redirect the current window to /run_experiment
-                    window.location.href = "/run_experiment";
-                }, 1); // You can adjust the delay in milliseconds if needed
-
-                window.alreadyOpened = true; // Set a flag to indicate that the new window is opened
-            }
-        </script>
-        """ % (all_parameters)
-
-        response = make_response(
-            f"dataset={selected_dataset}, Selected Model: {selected_model}, Selected Window Size: {selected_window_size}, Selected Drift Pattern: {selected_drift_pattern} {script}")
-    else:
-        # This block should execute when you access /run_experiment directly
-        response = make_response(render_template("run_experiment.html", dataset=selected_dataset, model=selected_model, drift_pattern=selected_drift_pattern))
-
-    return response
+    return render_template('drift_lens_monitor.html', title=title, num_labels=3, label_names=",".join(["label1", "label2", "label3"]))
 
 
+"""
+Serve root index file
+"""
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+"""
+Decorator for connect
+"""
+"""@socketio.on('connect')
+def connect():
+    global thread
+    print('Client connected')
+
+    global thread
+    with thread_lock:
+        if thread is None:
+            thread = socketio.start_background_task(background_thread)
+"""
+"""
+Decorator for disconnect
+"""
+@socketio.on('disconnect')
+def disconnect():
+    print('Client disconnected',  request.sid)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app)

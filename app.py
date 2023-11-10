@@ -10,6 +10,8 @@ import numpy as np
 from windows_manager.windows_generator import WindowsGenerator
 import json
 import random
+from drift_lens.drift_lens import DriftLens
+from utils import _utils
 
 app = Flask(__name__)
 
@@ -92,12 +94,103 @@ def drift_lens_monitor():
     selected_window_size = int(form_parameters['window_size'])
     selected_drift_pattern = form_parameters['drift_pattern']
 
+    # Load Embedding
+    new_unseen_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/new_unseen_embedding.hdf5"
+    drifted_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/drifted_embedding.hdf5"
 
-    def generate_chart_updates():
+    E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
+    E_drift, Y_original_drift, Y_predicted_drift = load_embedding(drifted_embedding_path)
+
+    training_label_list = [0, 1, 2]
+    drift_label_list = [3]
+    wg = WindowsGenerator(training_label_list, drift_label_list, E_new_unseen, Y_predicted_new_unseen,
+                          Y_original_new_unseen, E_drift, Y_predicted_drift, Y_original_drift)
+
+    # Create DriftLens Object
+    dl = DriftLens(training_label_list)
+
+    print("Loading Baseline")
+    baseline = dl.load_baseline(folderpath=f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/window_sizes/{selected_window_size}",
+                                                  baseline_name="baseline")
+
+    flag_shuffle = True
+    flag_replacement = True
+
+    if selected_drift_pattern == "no_drift":
+        print("no drift")
+        selected_number_of_windows = int(form_parameters["number_of_windows_no_drift"])
+        print(selected_number_of_windows)
+
+        E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_without_drift_windows_generation(
+            window_size=selected_window_size,
+            n_windows=selected_number_of_windows,
+            flag_shuffle=flag_shuffle,
+            flag_replacement=flag_replacement)
+
+    elif selected_drift_pattern == "sudden_drift":
+        print("sudden drift")
+        selected_number_of_windows = int(form_parameters["number_of_windows_sudden_drift"])
+        selected_drift_offset = int(form_parameters["drift_offset_sudden_drift"])
+        selected_drift_percentage = int(form_parameters["drift_percentage_sudden_drift"]) / 100
+        print(selected_number_of_windows)
+        print(selected_drift_offset)
+        print(selected_drift_percentage)
+
+        E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_incremental_drift_windows_generation(
+            window_size=selected_window_size,
+            n_windows=selected_number_of_windows,
+            starting_drift_percentage=selected_drift_percentage,
+            drift_increase_rate=0,
+            drift_offset=selected_drift_offset,
+            flag_shuffle=flag_shuffle,
+            flag_replacement=flag_replacement)
+        for i, y in enumerate(Y_original_windows):
+            count_n = np.sum(y == 3)
+            print(f"window: {i} - {count_n}")
+
+    elif selected_drift_pattern == "incremental_drift":
+        print("incremental drift")
+        selected_number_of_windows = int(form_parameters["number_of_windows_incremental_drift"])
+        selected_drift_offset = int(form_parameters["drift_offset_incremental_drift"])
+        selected_starting_drift_percentage = int(form_parameters["drift_percentage_incremental_drift"]) / 100
+        selected_increasing_drift_percentage = int(form_parameters["drift_increasing_percentage_incremental_drift"]) / 100
+
+        print(selected_starting_drift_percentage)
+        print(selected_increasing_drift_percentage)
+
+
+        E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_incremental_drift_windows_generation(
+            window_size=selected_window_size,
+            n_windows=selected_number_of_windows,
+            starting_drift_percentage=selected_starting_drift_percentage,
+            drift_increase_rate=selected_increasing_drift_percentage,
+            drift_offset=selected_drift_offset,
+            flag_shuffle=flag_shuffle,
+            flag_replacement=flag_replacement)
+
+        for i, y in enumerate(Y_original_windows):
+            count_n = np.sum(y == 3)
+            print(f"window: {i} - {count_n}")
+
+    if selected_drift_pattern == "periodic_drift":
+        print("periodic drift")
+
+
+    """def generate_chart_updates():
         while True:
             # Replace this with your logic to generate new data for the chart
             new_data = [random.randint(1, 10) for _ in range(10)]
             yield f"data: {json.dumps(new_data)}\n\n"
+            time.sleep(1)  # Adjust the sleep time as needed"""
+
+    def generate_chart_updates():
+        for i, (E_w, y_pred, y_true) in enumerate(zip(E_windows, Y_predicted_windows, Y_original_windows)):
+            window_distance = dl.compute_window_distribution_distances(E_w, y_pred)
+            window_distance["batch"] = _utils.clear_complex_number(window_distance["batch"])
+            for l in training_label_list:
+                window_distance["per-label"][str(l)] = _utils.clear_complex_number(window_distance["per-label"][str(l)])
+            print(f"window: {i} - {window_distance}")
+            yield f"data: {json.dumps(window_distance)}\n\n"
             time.sleep(1)  # Adjust the sleep time as needed
 
     return Response(generate_chart_updates(), content_type='text/event-stream')
@@ -118,75 +211,7 @@ def run_experiment():
         selected_drift_pattern = request.form.get("drift_pattern")
         all_parameters = request.form.to_dict()
 
-        # Load Embedding
-        new_unseen_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/new_unseen_embedding.hdf5"
-        drifted_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/drifted_embedding.hdf5"
 
-        E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
-        E_drift, Y_original_drift, Y_predicted_drift = load_embedding(drifted_embedding_path)
-
-        training_label_list = [0, 1, 2]
-        drift_label_list = [3]
-        wg = WindowsGenerator(training_label_list, drift_label_list, E_new_unseen, Y_predicted_new_unseen,
-                                                Y_original_new_unseen, E_drift, Y_predicted_drift, Y_original_drift)
-
-        flag_shuffle = True
-        flag_replacement = True
-
-        if selected_drift_pattern == "no_drift":
-            print("no drift")
-            selected_number_of_windows = int(request.form.get("number_of_windows_no_drift"))
-            print(selected_number_of_windows)
-
-            E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_without_drift_windows_generation(window_size=selected_window_size,
-                                                                                                              n_windows=selected_number_of_windows,
-                                                                                                              flag_shuffle=flag_shuffle,
-                                                                                                              flag_replacement=flag_replacement)
-
-        elif selected_drift_pattern == "sudden_drift":
-            print("sudden drift")
-            selected_number_of_windows = int(request.form.get("number_of_windows_sudden_drift"))
-            selected_drift_offset = int(request.form.get("drift_offset_sudden_drift"))
-            selected_drift_percentage = int(request.form.get("drift_percentage_sudden_drift"))/100
-            print(selected_number_of_windows)
-            print(selected_drift_offset)
-            print(selected_drift_percentage)
-
-            E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_incremental_drift_windows_generation(window_size=selected_window_size,
-                                                                                                                  n_windows=selected_number_of_windows,
-                                                                                                                  starting_drift_percentage=selected_drift_percentage,
-                                                                                                                  drift_increase_rate=0,
-                                                                                                                  drift_offset=selected_drift_offset,
-                                                                                                                  flag_shuffle=flag_shuffle,
-                                                                                                                  flag_replacement=flag_replacement)
-            for i,y in enumerate(Y_original_windows):
-                count_n =  np.sum(y == 3)
-                print(f"window: {i} - {count_n}")
-
-        elif selected_drift_pattern == "incremental_drift":
-            print("incremental drift")
-            selected_number_of_windows = int(request.form.get("number_of_windows_incremental_drift"))
-            selected_drift_offset = int(request.form.get("drift_offset_incremental_drift"))
-            selected_starting_drift_percentage = int(request.form.get("drift_percentage_incremental_drift"))/100
-            selected_increasing_drift_percentage = int(request.form.get("drift_increasing_percentage_incremental_drift"))/100
-
-            print(selected_starting_drift_percentage)
-            print(selected_increasing_drift_percentage)
-
-            E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_incremental_drift_windows_generation(window_size=selected_window_size,
-                                                                                                                  n_windows=selected_number_of_windows,
-                                                                                                                  starting_drift_percentage=selected_starting_drift_percentage,
-                                                                                                                  drift_increase_rate=selected_increasing_drift_percentage,
-                                                                                                                  drift_offset=selected_drift_offset,
-                                                                                                                  flag_shuffle=flag_shuffle,
-                                                                                                                  flag_replacement=flag_replacement)
-
-            for i,y in enumerate(Y_original_windows):
-                count_n =  np.sum(y == 3)
-                print(f"window: {i} - {count_n}")
-
-        if selected_drift_pattern == "periodic_drift":
-            print("periodic drift")
 
 
         #for E_win in E_windows:

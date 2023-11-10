@@ -186,11 +186,14 @@ def drift_lens_monitor():
     def generate_chart_updates():
         for i, (E_w, y_pred, y_true) in enumerate(zip(E_windows, Y_predicted_windows, Y_original_windows)):
             window_distance = dl.compute_window_distribution_distances(E_w, y_pred)
-            if type(window_distance["batch"]) == "str":
+            window_distance["window_id"] = i
+            if isinstance(window_distance["batch"], complex):
                 window_distance["batch"] = float(_utils.clear_complex_number(window_distance["batch"]).real)
             for l in training_label_list:
-                if type( window_distance["per-label"][str(l)]) == "str":
+                if isinstance(window_distance["per-label"][str(l)], complex):
+                    print("clearing :", window_distance["per-label"][str(l)])
                     window_distance["per-label"][str(l)] = float(_utils.clear_complex_number(window_distance["per-label"][str(l)]).real)
+                    print(window_distance["per-label"][str(l)])
             print(f"window: {i} - {window_distance}")
             yield f"data: {json.dumps(window_distance)}\n\n"
             time.sleep(1)  # Adjust the sleep time as needed
@@ -213,12 +216,6 @@ def run_experiment():
         selected_drift_pattern = request.form.get("drift_pattern")
         all_parameters = request.form.to_dict()
 
-
-
-
-        #for E_win in E_windows:
-            # Do something and update plot
-
         # JavaScript to open a new window and redirect the current window
         script = """
         <script>
@@ -231,7 +228,7 @@ def run_experiment():
                 setTimeout(function() {
                     // Redirect the current window to /run_experiment
                     window.location.href = "/run_experiment";
-                }, 100); // You can adjust the delay in milliseconds if needed
+                }, 1); // You can adjust the delay in milliseconds if needed
 
                 window.alreadyOpened = true; // Set a flag to indicate that the new window is opened
             }

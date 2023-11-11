@@ -9,6 +9,15 @@ $(document).ready(function () {
       datasets: [{ label: "per-batch distance", data: [], }],
     },
     options: {
+      scales: {
+        y: {
+          beginAtZero: true, // You can customize other y-axis options here
+          title: {
+            display: true,
+            text: "Distribution Distance", // Set the label text here
+          },
+        },
+      },
       borderWidth: 3,
       borderColor: ["rgba(255, 99, 132, 1)"],
     },
@@ -30,6 +39,15 @@ $(document).ready(function () {
       })),
     },
     options: {
+      scales: {
+        y: {
+          beginAtZero: true, // You can customize other y-axis options here
+          title: {
+            display: true,
+            text: "Distribution Distance", // Set the label text here
+          },
+        },
+      },
       borderWidth: 3,
     },
   });

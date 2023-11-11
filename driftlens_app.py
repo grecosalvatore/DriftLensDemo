@@ -1,3 +1,5 @@
+import time
+
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO
 from random import random
@@ -120,6 +122,14 @@ def run_drift_detection_background_thread(form_parameters):
     flag_shuffle = True
     flag_replacement = True
 
+    #for i in range(1001):
+    #    percentage = int((i / 1000) * 100)  # Calculate the percentage
+
+        # Create a message with the current percentage
+    #    message = json.dumps({"currentProgress": percentage})
+    #    socketio.emit('UpdateProgressBarDataStreamGeneration', message)
+    #    time.sleep(1)
+
     if selected_drift_pattern == "no_drift":
         print("no drift")
         selected_number_of_windows = int(form_parameters["number_of_windows_no_drift"])
@@ -129,7 +139,8 @@ def run_drift_detection_background_thread(form_parameters):
             window_size=selected_window_size,
             n_windows=selected_number_of_windows,
             flag_shuffle=flag_shuffle,
-            flag_replacement=flag_replacement)
+            flag_replacement=flag_replacement,
+            socketio=socketio)
 
     elif selected_drift_pattern == "sudden_drift":
         print("sudden drift")
@@ -147,7 +158,8 @@ def run_drift_detection_background_thread(form_parameters):
             drift_increase_rate=0,
             drift_offset=selected_drift_offset,
             flag_shuffle=flag_shuffle,
-            flag_replacement=flag_replacement)
+            flag_replacement=flag_replacement,
+            socketio=socketio)
 
     elif selected_drift_pattern == "incremental_drift":
         print("incremental drift")
@@ -163,7 +175,8 @@ def run_drift_detection_background_thread(form_parameters):
             drift_increase_rate=selected_increasing_drift_percentage,
             drift_offset=selected_drift_offset,
             flag_shuffle=flag_shuffle,
-            flag_replacement=flag_replacement)
+            flag_replacement=flag_replacement,
+            socketio=socketio)
 
 
     if selected_drift_pattern == "periodic_drift":

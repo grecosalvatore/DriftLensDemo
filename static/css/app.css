@@ -1,3 +1,4 @@
+/* Existing Styles */
 .hero {
     background: #eee;
     padding: 20px;
@@ -11,7 +12,6 @@
     text-align: center;
 }
 
-
 .chart-container {
 	max-width: 800px;
 	margin: 0 auto;
@@ -21,52 +21,81 @@
     background-color: #fff;
     border-bottom: 1px solid #ddd;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  }
+}
 
-  .navbar-brand {
+.navbar-brand {
     font-weight: bold;
     color: #333;
-  }
+}
 
-  .nav-link {
+.nav-link {
     color: #333;
-  }
+}
 
-  .nav-link:hover {
+.nav-link:hover {
     color: #007bff;
-  }
+}
 
-  footer {
+footer {
     background-color: #fff;
     border-top: 1px solid #ddd;
     padding: 20px;
-  }
+}
 
-.loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
+.loader-wrapper {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 9999; /* Ensure it's in front of other elements */
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
 }
 
-.loading-message {
-  position: fixed;
-  top: 60%; /* Adjust the position as needed */
+.loader {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.loader svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.loader-circle-bg {
+  fill: none;
+  stroke: #ddd;
+  stroke-width: 8;
+}
+
+.loader-circle {
+  fill: none;
+  stroke-width: 8;
+  stroke-dasharray: 219.9; /* Update this to match the circle's actual circumference */
+  stroke-dashoffset: 219.9; /* Initially offset to show no fill */
+  transition: stroke-dashoffset 0.3s;
+}
+
+
+.loader-percentage {
+  position: absolute;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   font-size: 20px;
   color: #333;
-  z-index: 9999; /* Ensure it's in front of other elements */
+  z-index: 1001;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.loader-text {
+  text-align: center;
+  margin: 0 auto; /* This centers the div itself if it has a specified width */
+  max-width: 800px; /* Maximum width of the div, adjust as necessary */
+  padding: 5px; /* Padding inside the div, can be adjusted or removed */
+  /* Other styles as necessary */
 }

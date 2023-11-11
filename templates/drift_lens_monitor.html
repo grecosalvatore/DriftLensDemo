@@ -6,9 +6,17 @@
     <script type="text/javascript" src="{{ url_for('static', filename = 'js/app.js') }}"></script>
 
     <div class="container">
-      <div class="loader"></div>
-      <div class="loading-message">Data stream generation...</div>
-
+      <div class="loader-wrapper">
+      <div class="loader">
+        <svg viewBox="0 0 100 100">
+          <circle class="loader-circle-bg" cx="50" cy="50" r="35"></circle>
+          <circle class="loader-circle" cx="50" cy="50" r="35"></circle>
+        </svg>
+      </div>
+      <div class="loader-percentage">0%</div>
+      <div class="loader-text">Data Stream Generation</div>
+    </div>
+    </div>
       <div class="hero">
         <h2>Per-Batch Drift Detection</h2>
         <div class="chart-container">

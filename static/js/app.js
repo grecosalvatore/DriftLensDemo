@@ -1,4 +1,8 @@
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
+  let loader = document.querySelector(".loader");
+  let loadingMessage = document.querySelector(".loading-message");
+  let hero = document.querySelector(".hero");
+
   const ctx = document.getElementById("myChart").getContext("2d");
   const ctx_per_label = document.getElementById("myChart_per_label").getContext("2d");
 
@@ -52,6 +56,13 @@ $(document).ready(function () {
     },
   });
 
+  // Show the loader and loading message initially
+  if (loader && loadingMessage) {
+    loader.style.display = "block";
+    loadingMessage.style.display = "block";
+    hero.style.display = "none";
+  }
+
   function getRandomColor() {
     const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
     return randomColor;
@@ -75,6 +86,8 @@ $(document).ready(function () {
     // Update both charts
     myChart.update();
     myChart_per_label.update();
+
+
   }
 
   function removeFirstData() {
@@ -100,6 +113,13 @@ $(document).ready(function () {
   // Receive details from the server
   socket.on("updateSensorData", function (msg) {
     console.log("Received sensorData :: " + msg.date + " :: " + msg.batch_distance + " :: " + msg.per_label_distances);
+
+    // Hide the loader and loading message when data is received
+    if (loader && loadingMessage) {
+      loader.style.display = "none";
+      loadingMessage.style.display = "none";
+      hero.style.display = "block"; // Show the hero when data is received
+    }
 
     // Show only MAX_DATA_COUNT data
     if (myChart.data.labels.length > MAX_DATA_COUNT) {

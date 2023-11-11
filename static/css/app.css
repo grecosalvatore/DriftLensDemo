@@ -41,3 +41,32 @@
     border-top: 1px solid #ddd;
     padding: 20px;
   }
+
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999; /* Ensure it's in front of other elements */
+}
+
+.loading-message {
+  position: fixed;
+  top: 60%; /* Adjust the position as needed */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  color: #333;
+  z-index: 9999; /* Ensure it's in front of other elements */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

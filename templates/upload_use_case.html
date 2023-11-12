@@ -1,0 +1,56 @@
+{% include "header.html" %}
+
+{% block content %}
+<form>
+    Dataset name: <input type="text" id="dataset-name" name="dataset" placeholder="Enter dataset name" onkeyup="checkInputs()">
+    <br><br>
+    Model name: <input type="text" id="model-name" name="model" placeholder="Enter model name" onkeyup="checkInputs()">
+    <br><br>
+    Baseline Data: <button type="button" class="upload-btn" id="baseline-upload" disabled onclick="uploadData('baseline')">Upload</button>
+    <br><br>
+    Threshold Data: <button type="button" class="upload-btn" id="threshold-upload" disabled onclick="uploadData('threshold')">Upload</button>
+    <br><br>
+    New Data: <button type="button" class="upload-btn" id="newdata-upload" disabled onclick="uploadData('newdata')">Upload</button>
+    <br><br>
+    Drift Data: <button type="button" class="upload-btn" id="drift-upload" disabled onclick="uploadData('drift')">Upload</button>
+    <br><br>
+    <button type="submit" id="submit-btn" disabled>Submit</button>
+</form>
+
+<script type="text/javascript">
+    let uploadsCompleted = { baseline: false, threshold: false, newdata: false, drift: false };
+
+    function checkInputs() {
+        var dataset = document.getElementById('dataset-name').value;
+        var model = document.getElementById('model-name').value;
+        var allFilled = dataset && model;
+
+        var uploadButtons = document.getElementsByClassName('upload-btn');
+        for (var i = 0; i < uploadButtons.length; i++) {
+            uploadButtons[i].disabled = !allFilled;
+        }
+
+        checkSubmitButton();
+    }
+
+    function uploadData(type) {
+        // Simulate an upload process
+        console.log('Uploading ' + type);
+        uploadsCompleted[type] = true;
+
+        // Check if all uploads are completed
+        checkSubmitButton();
+    }
+
+    function checkSubmitButton() {
+        var allUploadsCompleted = Object.values(uploadsCompleted).every(status => status === true);
+        var datasetFilled = document.getElementById('dataset-name').value !== '';
+        var modelFilled = document.getElementById('model-name').value !== '';
+
+        document.getElementById('submit-btn').disabled = !(allUploadsCompleted && datasetFilled && modelFilled);
+    }
+</script>
+{% endblock %}
+
+
+{% include "footer.html" %}

@@ -242,7 +242,6 @@ def upload_chunk():
 
     return jsonify(message="Chunk received")
 
-# Other routes and app run configuration
 
 
 

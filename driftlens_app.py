@@ -225,6 +225,9 @@ Serve root index file
 def index():
     return render_template('index.html')
 
+@app.route('/upload_use_case')
+def upload_use_case():
+    return render_template('upload_use_case.html')
 """
 Decorator for connect
 """

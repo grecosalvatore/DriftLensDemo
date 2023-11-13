@@ -3,17 +3,12 @@
 {% block content %}
 <form>
     Dataset name: <input type="text" id="dataset-name" name="dataset" placeholder="Enter dataset name" onkeyup="checkInputs()">
-    <br><br>
     Model name: <input type="text" id="model-name" name="model" placeholder="Enter model name" onkeyup="checkInputs()">
     <br><br>
-    Baseline Data: <button type="button" class="upload-btn" id="baseline-upload" disabled onclick="uploadData('baseline')">Upload</button>
-    <br><br>
-    Threshold Data: <button type="button" class="upload-btn" id="threshold-upload" disabled onclick="uploadData('threshold')">Upload</button>
-    <br><br>
-    New Data: <button type="button" class="upload-btn" id="newdata-upload" disabled onclick="uploadData('newdata')">Upload</button>
-    <br><br>
-    Drift Data: <button type="button" class="upload-btn" id="drift-upload" disabled onclick="uploadData('drift')">Upload</button>
-    <br><br>
+    Baseline Data: <input type="file" class="upload-btn" id="baseline-upload" accept=".hdf5" disabled onchange="uploadData('baseline')">
+    Threshold Data: <input type="file" class="upload-btn" id="threshold-upload" accept=".hdf5" disabled onchange="uploadData('threshold')">
+    New Data: <input type="file" class="upload-btn" id="newdata-upload" accept=".hdf5" disabled onchange="uploadData('newdata')">
+    Drift Data: <input type="file" class="upload-btn" id="drift-upload" accept=".hdf5" disabled onchange="uploadData('drift')">
     <button type="submit" id="submit-btn" disabled>Submit</button>
 </form>
 
@@ -34,7 +29,7 @@
     }
 
     function uploadData(type) {
-        // Simulate an upload process
+        // Update the code here to handle the file upload process
         console.log('Uploading ' + type);
         uploadsCompleted[type] = true;
 
@@ -51,6 +46,5 @@
     }
 </script>
 {% endblock %}
-
 
 {% include "footer.html" %}

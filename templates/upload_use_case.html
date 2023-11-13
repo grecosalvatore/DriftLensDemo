@@ -1,7 +1,7 @@
 {% include "header.html" %}
 
 {% block content %}
-<form>
+<form enctype="multipart/form-data" onsubmit="handleSubmit(event)">
     Dataset name: <input type="text" id="dataset-name" name="dataset" placeholder="Enter dataset name" onkeyup="checkInputs()">
     Model name: <input type="text" id="model-name" name="model" placeholder="Enter model name" onkeyup="checkInputs()">
     <br><br>
@@ -44,6 +44,49 @@
 
         document.getElementById('submit-btn').disabled = !(allUploadsCompleted && datasetFilled && modelFilled);
     }
+
+function handleSubmit(event) {
+    event.preventDefault();
+    var files = [
+        document.getElementById('baseline-upload').files[0],
+        document.getElementById('threshold-upload').files[0],
+        document.getElementById('newdata-upload').files[0],
+        document.getElementById('drift-upload').files[0]
+    ];
+
+    files.forEach(file => {
+        if (file) {
+            chunkAndUploadFile(file);
+        }
+    });
+}
+
+function chunkAndUploadFile(file) {
+    const chunkSize = 5 * 1024 * 1024; // e.g., 5MB
+    let start = 0;
+
+    while (start < file.size) {
+        let end = Math.min(start + chunkSize, file.size);
+        let chunk = file.slice(start, end);
+        let formData = new FormData();
+        formData.append('fileChunk', chunk, file.name);
+        // You might want to append additional data to identify the chunk number or total chunks
+
+        fetch('/upload_chunk', {
+            method: 'POST',
+            body: formData
+        }).then(response => response.json())
+          .then(data => {
+            console.log(data.message); // You can update the UI to show progress here
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+
+        start = end;
+    }
+}
+
 </script>
 {% endblock %}
 

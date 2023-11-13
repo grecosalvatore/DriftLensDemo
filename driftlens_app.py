@@ -1,7 +1,8 @@
 import time
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO
+from werkzeug.utils import secure_filename
 from random import random
 from threading import Lock
 from datetime import datetime
@@ -228,6 +229,23 @@ def index():
 @app.route('/upload_use_case')
 def upload_use_case():
     return render_template('upload_use_case.html')
+
+
+
+
+@app.route('/upload_chunk', methods=['POST'])
+def upload_chunk():
+    chunk = request.files['fileChunk']
+    filename = secure_filename(chunk.filename)
+    # Add logic to handle chunk (e.g., save to /tmp with a unique identifier)
+    # You may need to track the chunks to reassemble them later
+
+    return jsonify(message="Chunk received")
+
+# Other routes and app run configuration
+
+
+
 """
 Decorator for connect
 """

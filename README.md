@@ -1,4 +1,11 @@
-# Drift Lens Demo
+
+
+<div align="center">
+  <img src="static/images/Drift_Lens_Logo_cropped.png" width="300"/>
+  <h4>DriftLens Demo: Real-time Unsupervised Concept Drift Detection for Deep Learning Models</h4>
+</div>
+<br/>
+
 
 *DriftLens* is an **unsupervised drift detection** framework for deep learning classifiers on unstructured data.
 It performs distribution distances between a historical dataset, called baseline, and a new data stream divided in fixed-sized windows.

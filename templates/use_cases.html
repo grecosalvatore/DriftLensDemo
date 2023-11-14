@@ -186,6 +186,10 @@ Drift: Simulated with one new class label: Science/Tech</td>
             <label for="number_of_windows_no_drift">Number of windows:</label>
             <input type="range" id="number_of_windows_no_drift" name="number_of_windows_no_drift" min="10" max="1000" step="10" value="100">
             <output for="number_of_windows_no_drift">100</output>
+            <br>
+            <label for="latency_no_drift">Windows Latency (ms):</label>
+            <input type="range" id="latency_no_drift" name="latency_no_drift" min="0" max="60000" step="1000" value="0">
+            <output for="latency_no_drift">0</output>
         </div>
 
         <!-- Additional elements for Sudden Drift (Number of Windows, Drift Offset, and Drift Percentage) -->
@@ -193,6 +197,10 @@ Drift: Simulated with one new class label: Science/Tech</td>
             <label for="number_of_windows_sudden_drift">Number of Windows:</label>
             <input type="range" id="number_of_windows_sudden_drift" name="number_of_windows_sudden_drift" min="10" max="1000" step="10" value="100">
             <output for="number_of_windows_sudden_drift">100</output>
+            <br>
+            <label for="latency_sudden_drift">Windows Latency (ms):</label>
+            <input type="range" id="latency_sudden_drift" name="latency_sudden_drift" min="0" max="60000" step="1000" value="0">
+            <output for="latency_sudden_drift">0</output>
             <br>
             <label for="drift_offset_sudden_drift">Drift Starting Offset:</label>
             <input type="range" id="drift_offset_sudden_drift" name="drift_offset_sudden_drift" min="10" max="1000" step="10" value="50">
@@ -209,6 +217,10 @@ Drift: Simulated with one new class label: Science/Tech</td>
             <label for="number_of_windows_incremental_drift">Number of Windows:</label>
             <input type="range" id="number_of_windows_incremental_drift" name="number_of_windows_incremental_drift" min="10" max="1000" step="10" value="100">
             <output for="number_of_windows_incremental_drift">100</output>
+            <br>
+            <label for="latency_incremental_drift">Windows Latency (ms):</label>
+            <input type="range" id="latency_incremental_drift" name="latency_incremental_drift" min="0" max="60000" step="1000" value="0">
+            <output for="latency_incremental_drift">0</output>
             <br>
             <label for="drift_offset_incremental_drift">Drift Starting Offset:</label>
             <input type="range" id="drift_offset_incremental_drift" name="drift_offset_incremental_drift" min="10" max="1000" step="10" value="50">
@@ -227,6 +239,10 @@ Drift: Simulated with one new class label: Science/Tech</td>
             <label for="number_of_windows_periodic_drift">Number of Windows:</label>
             <input type="range" id="number_of_windows_periodic_drift" name="number_of_windows_periodic_drift" min="10" max="1000" step="10" value="100">
             <output for="number_of_windows_periodic_drift">100</output>
+            <br>
+            <label for="latency_periodic_drift">Windows Latency (ms):</label>
+            <input type="range" id="latency_periodic_drift" name="latency_periodic_drift" min="0" max="60000" step="1000" value="0">
+            <output for="latency_periodic_drift">0</output>
             <br>
             <label for="drift_offset_periodic_drift">Drift Offset:</label>
             <input type="range" id="drift_offset_periodic_drift" name="drift_offset_periodic_drift" min="10" max="1000" step="10" value="50">
@@ -257,6 +273,10 @@ Drift: Simulated with one new class label: Science/Tech</td>
     var number_of_windows_sudden_drift = document.getElementById("number_of_windows_sudden_drift");
     var number_of_windows_incremental_drift = document.getElementById("number_of_windows_incremental_drift");
     var number_of_windows_periodic_drift = document.getElementById("number_of_windows_periodic_drift");
+    var latency_no_drift = document.getElementById("latency_no_drift");
+    var latency_sudden_drift = document.getElementById("latency_sudden_drift");
+    var latency_incremental_drift = document.getElementById("latency_incremental_drift");
+    var latency_periodic_drift = document.getElementById("latency_periodic_drift");
     var drift_offset_sudden_drift = document.getElementById("drift_offset_sudden_drift");
     var drift_percentage_sudden_drift = document.getElementById("drift_percentage_sudden_drift");
     var drift_offset_incremental_drift = document.getElementById("drift_offset_incremental_drift");
@@ -358,7 +378,6 @@ Drift: Simulated with one new class label: Science/Tech</td>
         validateForm(); // Call your validation function (if needed)
     });
 
-
     number_of_windows_sudden_drift.addEventListener("input", function() {
         var outputElement = this.nextElementSibling; // Get the <output> element for this input
         outputElement.textContent = this.value; // Update the <output> element with the current value
@@ -391,6 +410,30 @@ Drift: Simulated with one new class label: Science/Tech</td>
     });
 
     number_of_windows_periodic_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    latency_no_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    latency_sudden_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    latency_incremental_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    latency_periodic_drift.addEventListener("input", function() {
         var outputElement = this.nextElementSibling; // Get the <output> element for this input
         outputElement.textContent = this.value; // Update the <output> element with the current value
         validateForm(); // Call your validation function (if needed)

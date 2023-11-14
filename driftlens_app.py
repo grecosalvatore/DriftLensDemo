@@ -93,9 +93,6 @@ def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name
     return E, Y_original, Y_predicted
 
 def run_drift_detection_background_thread(form_parameters):
-    print("\n\n")
-    print("drift_lens_monitor Reciving")
-    print("\n\n")
     selected_dataset = form_parameters['dataset']
     selected_model = form_parameters['model']
     selected_window_size = int(form_parameters['window_size'])
@@ -117,23 +114,17 @@ def run_drift_detection_background_thread(form_parameters):
     dl = DriftLens(training_label_list)
 
     print("Loading Baseline")
-    baseline = dl.load_baseline(folderpath=f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/window_sizes/{selected_window_size}",
+    baseline = dl.load_baseline(folderpath=f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}",
                                                   baseline_name="baseline")
 
     flag_shuffle = True
     flag_replacement = True
 
-    #for i in range(1001):
-    #    percentage = int((i / 1000) * 100)  # Calculate the percentage
-
-        # Create a message with the current percentage
-    #    message = json.dumps({"currentProgress": percentage})
-    #    socketio.emit('UpdateProgressBarDataStreamGeneration', message)
-    #    time.sleep(1)
 
     if selected_drift_pattern == "no_drift":
         print("no drift")
         selected_number_of_windows = int(form_parameters["number_of_windows_no_drift"])
+        selected_latency = int(form_parameters["latency_no_drift"])
         print(selected_number_of_windows)
 
         E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_without_drift_windows_generation(
@@ -146,6 +137,7 @@ def run_drift_detection_background_thread(form_parameters):
     elif selected_drift_pattern == "sudden_drift":
         print("sudden drift")
         selected_number_of_windows = int(form_parameters["number_of_windows_sudden_drift"])
+        selected_latency = int(form_parameters["latency_sudden_drift"])
         selected_drift_offset = int(form_parameters["drift_offset_sudden_drift"])
         selected_drift_percentage = int(form_parameters["drift_percentage_sudden_drift"]) / 100
         print(selected_number_of_windows)
@@ -165,6 +157,7 @@ def run_drift_detection_background_thread(form_parameters):
     elif selected_drift_pattern == "incremental_drift":
         print("incremental drift")
         selected_number_of_windows = int(form_parameters["number_of_windows_incremental_drift"])
+        selected_latency = int(form_parameters["latency_incremental_drift"])
         selected_drift_offset = int(form_parameters["drift_offset_incremental_drift"])
         selected_starting_drift_percentage = int(form_parameters["drift_percentage_incremental_drift"]) / 100
         selected_increasing_drift_percentage = int(form_parameters["drift_increasing_percentage_incremental_drift"]) / 100
@@ -199,7 +192,7 @@ def run_drift_detection_background_thread(form_parameters):
         #yield f"data: {json.dumps(window_distance)}\n\n"
         print(window_distance["per-label"])
         socketio.emit('updateSensorData', {'batch_distance': window_distance["batch"], "per_label_distances":per_label_distances , "date": get_current_datetime()})
-        socketio.sleep(0)
+        socketio.sleep(selected_latency/1000)
 
 @app.route("/drift_lens_monitor", methods=["GET", "POST"])
 def drift_lens_monitor():

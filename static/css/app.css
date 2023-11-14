@@ -1,4 +1,4 @@
-/* Existing Styles */
+
 .hero {
     background: #eee;
     padding: 20px;
@@ -94,8 +94,18 @@ footer {
 
 .loader-text {
   text-align: center;
-  margin: 0 auto; /* This centers the div itself if it has a specified width */
-  max-width: 800px; /* Maximum width of the div, adjust as necessary */
-  padding: 5px; /* Padding inside the div, can be adjusted or removed */
-  /* Other styles as necessary */
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 5px;
 }
+
+.center-image {
+    text-align: center;
+    margin: auto;
+}
+
+.center-image figcaption {
+    margin-top: 10px;
+    font-style: italic;
+}
+

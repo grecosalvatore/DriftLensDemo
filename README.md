@@ -6,12 +6,13 @@ It performs distribution distances between a historical dataset, called baseline
 # Table of Contents
 
 - [Methodology and Models](#methodology-and-models)
-- [Project Demo](#demo)
-  - [How does it work?](#how-does-it-work)
+- [DriftLens Demo](#demo)
   - [Screenshots](#screenshots)
 - [References](#references)
-- [People behind DriftLens](#people-behind-driftlens)
+- [People involved](#people-behind-driftlens)
 
+# Methodology and Models
+![Screenshot](static/images/driftlens-demo-architecture.png)
 
 # References
 ```bibtex

@@ -24,7 +24,7 @@ The Drift Detection methodology in DriftLens includes two main phases: an *offli
 
 ## Offline Phase
 The *offline* phase takes as input an historical dataset, called baseline, that represents what the model learned during training. Firstly, the baseline data is feed into the model to extract the embedding vectors and the predicted labels 
-&#x2780; &#x2776;
+&#x2780; &#x2776; &#x2460;. Then, the majority of the baseline dataset is used to model the distributions of the baseline &#x2777;. Instead, a small portion of the baseline data is used to estimate the threshold values &#x2778;
 ## Online Phase
 
 # References

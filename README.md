@@ -20,6 +20,12 @@ It performs distribution distances between a historical dataset, called baseline
 
 # Methodology and Models
 ![Screenshot](static/images/driftlens-demo-architecture.png)
+The Drift Detection methodology in DriftLens includes two main phases: an *offline* and an *online*phases.
+
+## Offline Phase
+The *offline* phase takes as input an historical dataset, called baseline, that represents what the model learned during training. Firstly, the baseline data is feed into the model to extract the embedding vectors and the predicted labels 
+&#x2780; &#x2776;
+## Online Phase
 
 # References
 ```bibtex

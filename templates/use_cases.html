@@ -273,6 +273,17 @@ Drift: Simulated with one new class label: Science/Tech</td>
         <br>
         <h3>Threshold Configuration</h3>
         <br>
+        <div id="threshold_configuration_container" style="display: none;">
+            <label for="threshold_sensitivity">Threshold Sensitivity:</label>
+            <input type="range" id="threshold_sensitivity" name="threshold_sensitivity" min="0" max="5" step="0.1" value="1">
+            <output for="threshold_sensitivity">1</output>
+        <br>
+        <div class="threshold-chart-container">
+            <canvas id="thresholdChartPerBatch" width="100" height="100"></canvas>
+            <canvas id="thresholdChartPerLabel" width="100" height="100"></canvas>
+        </div>
+        </div>
+        <br>
         <br>
         <input type="submit" value="Run Experiment" id="submit-button" disabled>
     </form>
@@ -304,9 +315,19 @@ Drift: Simulated with one new class label: Science/Tech</td>
     var drift_offset_periodic_drift = document.getElementById("drift_offset_periodic_drift");
     var drift_duration_periodic_drift = document.getElementById("drift_duration_periodic_drift");
     var drift_percentage_periodic_drift = document.getElementById("drift_percentage_periodic_drift");
+    var threshold_configuration_container = document.getElementById("threshold_configuration_container")
+    var threshold_sensitivity = document.getElementById("threshold_sensitivity")
 
     // Convert the datasets variable from JSON format
     var datasets = JSON.parse('{{ data|tojson|safe }}');
+
+    // Global variables for storing chart instances and data
+    var chartInstanceBatch;
+    var chartInstanceLabel;
+    var thresholdBatchData = [];
+
+
+
 
     datasetDropdown.addEventListener("change", function() {
         // Clear existing options in the model and window size dropdowns
@@ -372,6 +393,7 @@ Drift: Simulated with one new class label: Science/Tech</td>
     }
 
     windowSizeDropdown.addEventListener("change", function() {
+        threshold_configuration_container.style.display = "block";
         validateForm();
     });
 
@@ -507,8 +529,26 @@ Drift: Simulated with one new class label: Science/Tech</td>
         var outputElement = this.nextElementSibling; // Get the <output> element for this input
         outputElement.textContent = this.value; // Update the <output> element with the current value
         validateForm(); // Call your validation function (if needed)
-    });
+        });
 
+    threshold_sensitivity.addEventListener("change", function() {
+        console.log("Change event triggered");
+        var outputElement = this.nextElementSibling;
+        outputElement.textContent = this.value;
+        var sensitivityValue = parseFloat(this.value);
+        var qValue = sensitivityValue;
+
+        if (chartInstanceBatch) {
+            const q = quantile(thresholdBatchData, qValue);
+            const filteredData = thresholdBatchData.filter(x => x < q);
+            var maxValue = Math.max(...filteredData);
+            chartInstanceBatch.options.plugins.annotation.annotations.line1.yMin = maxValue;
+            chartInstanceBatch.options.plugins.annotation.annotations.line1.yMax = maxValue;
+            chartInstanceBatch.update();
+        }
+
+        // Similar logic for chartInstanceLabel if needed
+    });
     // Additional input validation and event listeners for other drift patterns (Incremental Drift, Periodic Drift) can be added similarly.
 
     function hideAdditionalOptions() {
@@ -517,6 +557,20 @@ Drift: Simulated with one new class label: Science/Tech</td>
         incrementalDriftOptions.style.display = "none";
         periodicDriftOptions.style.display = "none";
         // Hide other additional options here when implemented.
+    }
+
+    function quantile(arr, q) {
+        // Calculate the index to exclude the top q percent
+        const index = Math.ceil(arr.length * (q / 100)) - 1;
+
+        // Check if the index is within the bounds of the array
+        if (index >= 0 && index < arr.length) {
+            return arr[index];
+        } else {
+            // If q is 0 (or close to 0), return the maximum value (first element)
+            // If q is 1 (or close to 1), return the minimum value (last element)
+            return q <= 0 ? arr[0] : arr[arr.length - 1];
+        }
     }
 
     function loadDatasetDescription(datasetName) {
@@ -538,10 +592,78 @@ Drift: Simulated with one new class label: Science/Tech</td>
         };
     }
 
+    function createChart(contextId, chartData, label, borderColor) {
+        var ctx = document.getElementById(contextId).getContext('2d');
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.map((_, index) => index),
+                datasets: [{
+                    label: label,
+                    data: chartData,
+                    borderColor: borderColor,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true } },
+                plugins: {
+                    annotation: {
+                        annotations: {
+                            line1: {
+                                type: 'line',
+                                yMin: Math.max(...chartData.filter(x => x < quantile(chartData, 1))),
+                                yMax: Math.max(...chartData.filter(x => x < quantile(chartData, 1))),
+                                borderColor: 'rgb(255, 99, 132)',
+                                borderWidth: 2,
+                                label: { content: 'Max Threshold', enabled: true, position: 'start' }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateChartData(chart, newData) {
+        chart.data.datasets[0].data = newData;
+        chart.options.plugins.annotation.annotations.line1.yMin = Math.max(...newData.filter(x => x < quantile(newData, 1)));
+        chart.options.plugins.annotation.annotations.line1.yMax = Math.max(...newData.filter(x => x < quantile(newData, 1)));
+        chart.update();
+    }
+
+    document.getElementById('window_size').addEventListener('change', function() {
+        var selectedWindowSize = this.value;
+        var selectedModel = modelDropdown.value;
+        var selectedDataset = datasetDropdown.value;
+        var queryUrl = `/get_threshold_values?dataset=${selectedDataset}&model=${selectedModel}&window_size=${selectedWindowSize}`;
+
+        fetch(queryUrl)
+            .then(response => response.json())
+            .then(data => {
+                console.log("Received Data:", data);
+                thresholdBatchData = data;
+                if (!chartInstanceBatch) {
+                    chartInstanceBatch = createChart('thresholdChartPerBatch', data, 'Per-batch distances', 'rgb(75, 192, 192)');
+                    chartInstanceLabel = createChart('thresholdChartPerLabel', data, 'Per-label distances', 'rgb(192, 75, 192)');
+                } else {
+                    updateChartData(chartInstanceBatch, data);
+                    updateChartData(chartInstanceLabel, data);
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    });
+
+    threshold_sensitivity.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling;
+        outputElement.textContent = this.value;
+    });
+
     function validateForm() {
         var selectedModel = modelDropdown.value;
         var selectedDataset = datasetDropdown.value;
         var selectedDriftPattern = driftPatternDropdown.value;
+        //var selectedThresholdSensitivity = selectedThresholdSensitivity.value;
         //var selectedWindowSize = windowSizeDropdown.value;
 
         if (selectedModel && selectedDataset && selectedDriftPattern) {

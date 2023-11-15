@@ -230,6 +230,22 @@ def index():
 def upload_use_case():
     return render_template('upload_use_case.html')
 
+@app.route('/get_threshold_values', methods=["GET", "POST"])
+def get_threshold_values():
+    dataset = request.args.get('dataset')
+    model = request.args.get('model')
+    window_size = request.args.get('window_size', type=int)
+
+    # Print the received parameters for debugging
+    print("Received Parameters:")
+    print("Dataset:", dataset)
+    print("Model:", model)
+    print("Window Size:", window_size)
+
+    # Convert data to a list for JSON response
+    data_list = np.load(f"static/use_cases/datasets/{dataset}/models/{model}/window_sizes/{window_size}/thresholds/th_batch.npy").tolist()
+    return jsonify(data_list)
+
 
 
 

@@ -17,6 +17,15 @@
 	margin: 0 auto;
 }
 
+.threshold-chart-container {
+	max-width: 300px;
+	margin: 0 auto;
+    display: flex;
+    justify-content: space-around; /* This will space out the charts evenly */
+    align-items: center; /* This will align charts vertically in the middle */
+
+}
+
 .navbar {
     background-color: #fff;
     border-bottom: 1px solid #ddd;

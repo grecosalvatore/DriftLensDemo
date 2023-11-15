@@ -37,7 +37,7 @@ The Drift Detection methodology in DriftLens includes two main phases: an *offli
   </thead>
   <tbody>
     <tr>
-      <td>1.1</td>
+      <th>1.1</th>
       <td rowspan="3">Ag News</td>
       <td rowspan="3">Text</td>
       <td>BERT</td>
@@ -47,12 +47,12 @@ Training Labels: World, Business, and Sport <BR>
 Drift: Simulated with one new class label: Science/Tech</td>
     </tr>
     <tr>
-      <td>1.2</td>
+      <th>1.2</th>
       <td>DistillBERT</td>
       <td>0.97</td>
     </tr>
     <tr>
-      <td>1.3</td>
+      <th>1.3</th>
       <td>RoBERTa</td>
       <td>0.98</td>
     </tr>
@@ -65,7 +65,7 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td></td>
     </tr>
   <tr>
-      <td>2.1</td>
+      <th>2.1</th>
       <td rowspan="3">20 Newsgroup</td>
       <td rowspan="3">Text</td>
       <td>BERT</td>
@@ -73,12 +73,12 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td rowspan="3"></td>
     </tr>
     <tr>
-      <td>2.2</td>
+      <th>2.2</th>
       <td>DistillBERT</td>
       <td>0.87</td>
     </tr>
     <tr>
-      <td>2.3</td>
+      <th>2.3</th>
       <td>RoBERTa</td>
       <td>0.88</td>
     </tr>
@@ -91,7 +91,7 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td></td>
     </tr>
   <tr>
-      <td>3.1</td>
+      <th>3.1</th>
       <td rowspan="2">STL</td>
       <td rowspan="2">Computer Vision</td>
       <td>VGG16</td>
@@ -99,7 +99,7 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td rowspan="2"></td>
     </tr>
     <tr>
-      <td>3.2</td>
+      <th>3.2</th>
       <td>VisionTransformer</td>
       <td>??</td>
     </tr>
@@ -112,7 +112,7 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td></td>
     </tr>
   <tr>
-      <td>4.1</td>
+      <th>4.1</th>
       <td rowspan="2">STL</td>
       <td rowspan="2">Computer Vision</td>
       <td>VGG16</td>
@@ -120,7 +120,7 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td rowspan="2"></td>
     </tr>
     <tr>
-      <td>4.2</td>
+      <th>4.2</th>
       <td>VisionTransformer</td>
       <td>??</td>
     </tr>

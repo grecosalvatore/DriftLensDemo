@@ -247,6 +247,10 @@ Drift: Simulated with one new class label: Science/Tech</td>
             <input type="range" id="drift_offset_periodic_drift" name="drift_offset_periodic_drift" min="10" max="1000" step="10" value="50">
             <output for="drift_offset_periodic_drift">50</output>
             <br>
+            <label for="drift_duration_periodic_drift">Drift Duration:</label>
+            <input type="range" id="drift_duration_periodic_drift" name="drift_duration_periodic_drift" min="10" max="1000" step="10" value="50">
+            <output for="drift_duration_periodic_drift">50</output>
+            <br>
             <label for="drift_percentage_periodic_drift">Drift Percentage:</label>
             <input type="range" id="drift_percentage_periodic_drift" name="drift_percentage_periodic_drift" min="1" max="100" step="1" value="20">
             <output for="drift_percentage_periodic_drift">20</output>
@@ -281,6 +285,9 @@ Drift: Simulated with one new class label: Science/Tech</td>
     var drift_offset_incremental_drift = document.getElementById("drift_offset_incremental_drift");
     var drift_percentage_incremental_drift = document.getElementById("drift_percentage_incremental_drift");
     var drift_increasing_percentage_incremental_drift = document.getElementById("drift_increasing_percentage_incremental_drift");
+    var drift_offset_periodic_drift = document.getElementById("drift_offset_periodic_drift");
+    var drift_duration_periodic_drift = document.getElementById("drift_duration_periodic_drift");
+    var drift_percentage_periodic_drift = document.getElementById("drift_percentage_periodic_drift");
 
     // Convert the datasets variable from JSON format
     var datasets = JSON.parse('{{ data|tojson|safe }}');
@@ -463,6 +470,24 @@ Drift: Simulated with one new class label: Science/Tech</td>
     });
 
     drift_increasing_percentage_incremental_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    drift_offset_periodic_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    drift_duration_periodic_drift.addEventListener("input", function() {
+        var outputElement = this.nextElementSibling; // Get the <output> element for this input
+        outputElement.textContent = this.value; // Update the <output> element with the current value
+        validateForm(); // Call your validation function (if needed)
+    });
+
+    drift_percentage_periodic_drift.addEventListener("input", function() {
         var outputElement = this.nextElementSibling; // Get the <output> element for this input
         outputElement.textContent = this.value; // Update the <output> element with the current value
         validateForm(); // Call your validation function (if needed)

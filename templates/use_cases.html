@@ -26,8 +26,9 @@
   </style>
 
 
-<h1>Use Case Selection</h1>
 
+<h1>Run Drift Experiment</h1>
+<h3>Use Cases</h3>
     <table>
   <caption>Pre-uploaded use cases.</caption>
   <thead>
@@ -141,9 +142,7 @@ Drift: Simulated with one new class label: Science/Tech</td>
 </table>
 
 
-
-
-    <h2>Choose Dataset and Model</h2>
+    <h3>Use Case Selection</h3>
     <form action="/drift_lens_monitor" method="POST">
         <label for="dataset">Select a Dataset:</label>
         <select id="dataset" name="dataset">
@@ -164,7 +163,7 @@ Drift: Simulated with one new class label: Science/Tech</td>
 
         <br>
         <br>
-        <h2>Drift Experiment Configuration</h2>
+        <h3>Data Stream Configuration</h3>
         <label for="window_size">Select Window Size:</label>
         <select id="window_size" name="window_size" disabled>
             <option value="" selected disabled>Select a Window Size</option>
@@ -271,10 +270,11 @@ Drift: Simulated with one new class label: Science/Tech</td>
             <input type="range" id="drift_percentage_periodic_drift" name="drift_percentage_periodic_drift" min="1" max="100" step="1" value="20">
             <output for="drift_percentage_periodic_drift">20</output>
         </div>
-
+        <br>
+        <h3>Threshold Configuration</h3>
         <br>
         <br>
-        <input type="submit" value="Submit" id="submit-button" disabled>
+        <input type="submit" value="Run Experiment" id="submit-button" disabled>
     </form>
 
     <script>

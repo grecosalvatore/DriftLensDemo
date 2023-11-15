@@ -318,7 +318,6 @@ class WindowsGenerator:
                                                                                              total_windows_progressbar=n_windows
                                                                                              )
 
-                print("m_window_drifted", m_window_drifted)
 
                 E_windows_drifted, Y_predicted_windows_drifted, Y_original_windows_drifted = self._balanced_sampling(
                                                                                                                 self.drifted_label_list,
@@ -344,9 +343,7 @@ class WindowsGenerator:
                 Y_predicted_periodic.extend(Y_predicted_windows)
                 Y_original_periodic.extend(Y_original_windows)
 
-            for i in range(n_periodic_remainder):
-
-
+            if n_periodic_remainder > 0:
                 if n_periodic_remainder <= drift_offset:
                     drift_offset_remainder = n_periodic_remainder
                     drift_duration_remainder = 0
@@ -354,7 +351,7 @@ class WindowsGenerator:
                     drift_offset_remainder = drift_offset
                     drift_duration_remainder = n_periodic_remainder - drift_offset_remainder
 
-                E_window, Y_predicted_window, Y_original_window = self._balanced_sampling(
+                E_window_no_drift, Y_predicted_window_no_drift, Y_original_window_no_drift = self._balanced_sampling(
                     label_list=self.training_label_list,
                     E=self.E,
                     Y_predicted=self.Y_predicted,
@@ -366,9 +363,9 @@ class WindowsGenerator:
                     starting_progressbar_offset=n_periodic * (drift_offset_remainder + drift_duration),
                     total_windows_progressbar=n_windows)
 
-                E_window_periodic.extend(E_window)
-                Y_predicted_periodic.extend(Y_predicted_window)
-                Y_original_periodic.extend(Y_original_window)
+                E_window_periodic.extend(E_window_no_drift)
+                Y_predicted_periodic.extend(Y_predicted_window_no_drift)
+                Y_original_periodic.extend(Y_original_window_no_drift)
 
                 if drift_duration_remainder > 0:
                     m_window_drifted = int(round(window_size * drift_percentage))
@@ -383,7 +380,7 @@ class WindowsGenerator:
                         drift_duration_remainder,
                         flag_replacement,
                         socketio=socketio,
-                        starting_progressbar_offset=i * (drift_offset_remainder + drift_duration_remainder) + drift_offset_remainder,
+                        starting_progressbar_offset=n_periodic * (drift_offset_remainder + drift_duration) + drift_offset_remainder,
                         total_windows_progressbar=n_windows
                         )
 
@@ -400,18 +397,16 @@ class WindowsGenerator:
                         total_windows_progressbar=n_windows,
                         update_progressbar=False
                     )
-                    for i in range(n_periodic_remainder):
+                    for i in range(drift_duration_remainder):
                         E_windows[i] = np.concatenate((E_windows[i], E_windows_drifted[i]), axis=0)
                         Y_predicted_windows[i] = np.concatenate((Y_predicted_windows[i], Y_predicted_windows_drifted[i]), axis=0)
                         Y_original_windows[i] = np.concatenate((Y_original_windows[i], Y_original_windows_drifted[i]), axis=0)
 
                         E_windows[i], Y_predicted_windows[i], Y_original_windows[i] = self._shuffle_dataset(E_windows[i], Y_predicted_windows[i], Y_original_windows[i])
 
-                    E_window_periodic.extend(E_window)
-                    Y_predicted_periodic.extend(Y_predicted_window)
-                    Y_original_periodic.extend(Y_original_window)
-
-
+                    E_window_periodic.extend(E_windows)
+                    Y_predicted_periodic.extend(Y_predicted_windows)
+                    Y_original_periodic.extend(Y_original_windows)
         return E_window_periodic, Y_predicted_periodic, Y_original_periodic
 
     @staticmethod

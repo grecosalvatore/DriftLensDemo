@@ -192,8 +192,6 @@ def run_drift_detection_background_thread(form_parameters):
             flag_replacement=flag_replacement,
             socketio=socketio)
 
-        for y in Y_original_windows:
-            print(np.count_nonzero(y == 3))
 
     for i, (E_w, y_pred, y_true) in enumerate(zip(E_windows, Y_predicted_windows, Y_original_windows)):
         window_distance = dl.compute_window_distribution_distances(E_w, y_pred)

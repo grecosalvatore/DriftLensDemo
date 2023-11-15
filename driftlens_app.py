@@ -175,6 +175,22 @@ def run_drift_detection_background_thread(form_parameters):
 
     if selected_drift_pattern == "periodic_drift":
         print("periodic drift")
+        selected_number_of_windows = int(form_parameters["number_of_windows_periodic_drift"])
+        selected_latency = int(form_parameters["latency_periodic_drift"])
+        selected_drift_offset = int(form_parameters["drift_offset_periodic_drift"])
+        selected_drift_duration = int(form_parameters["drift_percentage_periodic_drift"])
+        selected_drift_percentage = int(form_parameters["drift_percentage_periodic_drift"]) / 100
+
+
+        E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_periodic_drift_windows_generation(
+            window_size=selected_window_size,
+            n_windows=selected_number_of_windows,
+            drift_offset=selected_drift_offset,
+            drift_duration=selected_drift_duration,
+            drift_percentage=selected_drift_percentage,
+            flag_shuffle=flag_shuffle,
+            flag_replacement=flag_replacement,
+            socketio=socketio)
 
     for i, (E_w, y_pred, y_true) in enumerate(zip(E_windows, Y_predicted_windows, Y_original_windows)):
         window_distance = dl.compute_window_distribution_distances(E_w, y_pred)

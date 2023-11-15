@@ -88,7 +88,8 @@ def run_drift_detection_background_thread(form_parameters):
     selected_model = form_parameters['model']
     selected_window_size = int(form_parameters['window_size'])
     selected_drift_pattern = form_parameters['drift_pattern']
-
+    selected_threshold_sensitivity = form_parameters['threshold_sensitivity']
+    print("Selected Threshold", selected_threshold_sensitivity)
     # Load Embedding
     new_unseen_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/new_unseen_embedding.hdf5"
     drifted_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/drifted_embedding.hdf5"
@@ -96,6 +97,7 @@ def run_drift_detection_background_thread(form_parameters):
     E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
     E_drift, Y_original_drift, Y_predicted_drift = load_embedding(drifted_embedding_path)
 
+    # TODO: labels list is currently hard coded
     training_label_list = [0, 1, 2]
     drift_label_list = [3]
     wg = WindowsGenerator(training_label_list, drift_label_list, E_new_unseen, Y_predicted_new_unseen,
@@ -105,8 +107,7 @@ def run_drift_detection_background_thread(form_parameters):
     dl = DriftLens(training_label_list)
 
     print("Loading Baseline")
-    baseline = dl.load_baseline(folderpath=f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}",
-                                                  baseline_name="baseline")
+    dl.load_baseline(folderpath=f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}", baseline_name="baseline")
 
     flag_shuffle = True
     flag_replacement = True
@@ -189,6 +190,13 @@ def run_drift_detection_background_thread(form_parameters):
         window_distance["window_id"] = i
         if isinstance(window_distance["batch"], complex):
             window_distance["batch"] = float(_utils.clear_complex_number(window_distance["batch"]).real)
+
+        th = 2
+        if window_distance["batch"] > th:
+            batch_drift_prediction = 1
+        else:
+            batch_drift_prediction = 0
+
         for l in training_label_list:
             if isinstance(window_distance["per-label"][str(l)], complex):
                 print("clearing:", window_distance["per-label"][str(l)])
@@ -198,7 +206,8 @@ def run_drift_detection_background_thread(form_parameters):
 
         per_label_distances = ",".join(str(v) for k,v in window_distance["per-label"].items())
         print(window_distance["per-label"])
-        socketio.emit('updateSensorData', {'batch_distance': window_distance["batch"], "per_label_distances":per_label_distances , "date": get_current_datetime()})
+        socketio.emit('updateDriftData', {'batch_distance': window_distance["batch"], "per_label_distances":per_label_distances ,
+                                           "date": get_current_datetime(), "batch_drift_prediction":batch_drift_prediction})
         socketio.sleep(selected_latency/1000)
 
 @app.route("/drift_lens_monitor", methods=["GET", "POST"])

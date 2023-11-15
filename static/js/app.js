@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return randomColor;
   }
 
-  function addData(label, batch_distance, per_label_distances) {
+  function addData(label, batch_distance, per_label_distances, batch_drift_prediction) {
     myChart.data.labels.push(label);
     myChart.data.datasets.forEach((dataset) => {
       dataset.data.push(batch_distance);
@@ -167,8 +167,8 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Receive details from the server
-  socket.on("updateSensorData", function (msg) {
-    console.log("Received sensorData :: " + msg.date + " :: " + msg.batch_distance + " :: " + msg.per_label_distances);
+  socket.on("updateDriftData", function (msg) {
+    console.log("Received drift data :: " + msg.date + " :: " + msg.batch_distance + " :: " + msg.per_label_distances + " :: " + msg.batch_drift_prediction);
 
     // Hide the loader and loading message when data is received
     if (loaderWrapper && loaderPercentage && loaderText) { // Add loaderText here

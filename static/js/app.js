@@ -12,7 +12,21 @@ document.addEventListener("DOMContentLoaded", function () {
     type: "line",
     data: {
       labels: [], // Initialize labels array for per-batch chart
-      datasets: [{ label: "per-batch distance", data: [], }],
+      datasets: [
+            {
+                label: "per-batch distance",
+                data: [], // Your main dataset
+                borderColor: "rgba(255, 99, 132, 1)",
+                fill: false,
+            },
+            {
+                label: "Drift",
+                data: [], // Data for drift periods
+                borderColor: "rgba(0, 0, 0, 0)",
+                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                fill: 'origin',
+            }
+        ],
     },
     options: {
       scales: {
@@ -114,27 +128,37 @@ document.addEventListener("DOMContentLoaded", function () {
     return randomColor;
   }
 
+
   function addData(label, batch_distance, per_label_distances, batch_drift_prediction) {
     myChart.data.labels.push(label);
-    myChart.data.datasets.forEach((dataset) => {
-      dataset.data.push(batch_distance);
-    });
 
-    // Split per-label distances into an array
-    const perLabelValues = per_label_distances.split(",").map(Number);
+    // Update main dataset
+    myChart.data.datasets[0].data.push(batch_distance);
+
+    // Update drift dataset
+    if (batch_drift_prediction === 1) {
+        // If drift is predicted, add the batch distance to the drift dataset
+        myChart.data.datasets[1].data.push(batch_distance);
+    } else {
+        // If no drift, add null to maintain alignment
+        myChart.data.datasets[1].data.push(null);
+    }
 
     // Update per-label chart
+    const perLabelValues = per_label_distances.split(",").map(Number);
     myChart_per_label.data.labels.push(label);
     myChart_per_label.data.datasets.forEach((dataset, i) => {
-      dataset.data.push(perLabelValues[i]);
+        dataset.data.push(perLabelValues[i]);
     });
 
     // Update both charts
     myChart.update();
     myChart_per_label.update();
+}
 
 
-  }
+
+
 
   function removeFirstData() {
     // Remove the first data point from per-batch chart
@@ -182,6 +206,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (myChart.data.labels.length > MAX_DATA_COUNT) {
       removeFirstData();
     }
-    addData(msg.date, msg.batch_distance, msg.per_label_distances);
+    addData(msg.date + " w" + msg.window_id, msg.batch_distance, msg.per_label_distances, msg.batch_drift_prediction);
   });
 });

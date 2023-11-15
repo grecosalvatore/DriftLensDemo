@@ -207,7 +207,7 @@ def run_drift_detection_background_thread(form_parameters):
         per_label_distances = ",".join(str(v) for k,v in window_distance["per-label"].items())
         print(window_distance["per-label"])
         socketio.emit('updateDriftData', {'batch_distance': window_distance["batch"], "per_label_distances":per_label_distances ,
-                                           "date": get_current_datetime(), "batch_drift_prediction":batch_drift_prediction})
+                                           "date": get_current_datetime(), "batch_drift_prediction":batch_drift_prediction, "window_id":i})
         socketio.sleep(selected_latency/1000)
 
 @app.route("/drift_lens_monitor", methods=["GET", "POST"])

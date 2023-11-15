@@ -270,8 +270,16 @@ class WindowsGenerator:
         if bool(flag_shuffle):
             self.shuffle_datasets()
 
-        n_periodic = window_size//(drift_offset+drift_duration)
-        n_periodic_remainder = window_size%(drift_offset+drift_duration)
+        n_periodic = n_windows//(drift_offset+drift_duration)
+        n_periodic_remainder = n_windows%(drift_offset+drift_duration)
+
+        print("Number of windows", n_windows)
+        print("windows size", window_size)
+        print("drift_offset", drift_offset)
+        print("drift_duration", drift_duration)
+        print("n_periodic", n_periodic)
+        print("n_periodic_remainder", n_periodic_remainder)
+        print("drift_percentage", drift_percentage)
 
         E_window_periodic = []
         Y_predicted_periodic = []
@@ -280,7 +288,7 @@ class WindowsGenerator:
         if n_periodic > 0:
             for i in range(n_periodic):
 
-                E_window, Y_predicted_window, Y_original_window = self._balanced_sampling(label_list=self.training_label_list,
+                E_window_no_drift, Y_predicted_window_no_drift, Y_original_window_no_drift = self._balanced_sampling(label_list=self.training_label_list,
                                                                                           E=self.E,
                                                                                           Y_predicted=self.Y_predicted,
                                                                                           Y_original=self.Y_original,
@@ -291,9 +299,9 @@ class WindowsGenerator:
                                                                                           starting_progressbar_offset=i*(drift_offset+drift_duration),
                                                                                           total_windows_progressbar=n_windows)
 
-                E_window_periodic.extend(E_window)
-                Y_predicted_periodic.extend(Y_predicted_window)
-                Y_original_periodic.extend(Y_original_window)
+                E_window_periodic.extend(E_window_no_drift)
+                Y_predicted_periodic.extend(Y_predicted_window_no_drift)
+                Y_original_periodic.extend(Y_original_window_no_drift)
 
                 m_window_drifted = int(round(window_size * drift_percentage))
                 m_window = int(window_size - m_window_drifted)
@@ -303,12 +311,14 @@ class WindowsGenerator:
                                                                                              self.Y_predicted,
                                                                                              self.Y_original,
                                                                                              m_window,
-                                                                                             n_windows,
+                                                                                             drift_duration,
                                                                                              flag_replacement,
                                                                                              socketio=socketio,
                                                                                              starting_progressbar_offset=i * (drift_offset + drift_duration) + drift_offset,
                                                                                              total_windows_progressbar=n_windows
                                                                                              )
+
+                print("m_window_drifted", m_window_drifted)
 
                 E_windows_drifted, Y_predicted_windows_drifted, Y_original_windows_drifted = self._balanced_sampling(
                                                                                                                 self.drifted_label_list,
@@ -316,7 +326,7 @@ class WindowsGenerator:
                                                                                                                 self.Y_predicted_drifted,
                                                                                                                 self.Y_original_drifted,
                                                                                                                 m_window_drifted,
-                                                                                                                n_windows,
+                                                                                                                drift_duration,
                                                                                                                 flag_replacement,
                                                                                                                 socketio=socketio,
                                                                                                                 starting_progressbar_offset=i * (drift_offset + drift_duration) + drift_offset,
@@ -325,21 +335,14 @@ class WindowsGenerator:
                                                                                                             )
                 for i in range(drift_duration):
                     E_windows[i] = np.concatenate((E_windows[i], E_windows_drifted[i]), axis=0)
-                    Y_predicted_windows[i] = np.concatenate((Y_predicted_windows[i], Y_predicted_windows_drifted[i]),
-                                                            axis=0)
-                    Y_original_windows[i] = np.concatenate((Y_original_windows[i], Y_original_windows_drifted[i]),
-                                                           axis=0)
+                    Y_predicted_windows[i] = np.concatenate((Y_predicted_windows[i], Y_predicted_windows_drifted[i]), axis=0)
+                    Y_original_windows[i] = np.concatenate((Y_original_windows[i], Y_original_windows_drifted[i]), axis=0)
 
-                    E_windows[i], Y_predicted_windows[i], Y_original_windows[i] = self._shuffle_dataset(E_windows[i],
-                                                                                                        Y_predicted_windows[
-                                                                                                            i],
-                                                                                                        Y_original_windows[
-                                                                                                            i])
+                    E_windows[i], Y_predicted_windows[i], Y_original_windows[i] = self._shuffle_dataset(E_windows[i], Y_predicted_windows[i], Y_original_windows[i])
 
-                E_window_periodic.extend(E_window)
-                Y_predicted_periodic.extend(Y_predicted_window)
-                Y_original_periodic.extend(Y_original_window)
-
+                E_window_periodic.extend(E_windows)
+                Y_predicted_periodic.extend(Y_predicted_windows)
+                Y_original_periodic.extend(Y_original_windows)
 
             for i in range(n_periodic_remainder):
 
@@ -377,7 +380,7 @@ class WindowsGenerator:
                         self.Y_predicted,
                         self.Y_original,
                         m_window,
-                        n_windows,
+                        drift_duration_remainder,
                         flag_replacement,
                         socketio=socketio,
                         starting_progressbar_offset=i * (drift_offset_remainder + drift_duration_remainder) + drift_offset_remainder,
@@ -390,27 +393,19 @@ class WindowsGenerator:
                         self.Y_predicted_drifted,
                         self.Y_original_drifted,
                         m_window_drifted,
-                        n_windows,
+                        drift_duration_remainder,
                         flag_replacement,
                         socketio=socketio,
                         starting_progressbar_offset=i * (drift_offset_remainder + drift_duration_remainder) + drift_offset_remainder,
                         total_windows_progressbar=n_windows,
                         update_progressbar=False
                     )
-                    for i in range(drift_duration):
+                    for i in range(n_periodic_remainder):
                         E_windows[i] = np.concatenate((E_windows[i], E_windows_drifted[i]), axis=0)
-                        Y_predicted_windows[i] = np.concatenate(
-                            (Y_predicted_windows[i], Y_predicted_windows_drifted[i]),
-                            axis=0)
-                        Y_original_windows[i] = np.concatenate((Y_original_windows[i], Y_original_windows_drifted[i]),
-                                                               axis=0)
+                        Y_predicted_windows[i] = np.concatenate((Y_predicted_windows[i], Y_predicted_windows_drifted[i]), axis=0)
+                        Y_original_windows[i] = np.concatenate((Y_original_windows[i], Y_original_windows_drifted[i]), axis=0)
 
-                        E_windows[i], Y_predicted_windows[i], Y_original_windows[i] = self._shuffle_dataset(
-                            E_windows[i],
-                            Y_predicted_windows[
-                                i],
-                            Y_original_windows[
-                                i])
+                        E_windows[i], Y_predicted_windows[i], Y_original_windows[i] = self._shuffle_dataset(E_windows[i], Y_predicted_windows[i], Y_original_windows[i])
 
                     E_window_periodic.extend(E_window)
                     Y_predicted_periodic.extend(Y_predicted_window)

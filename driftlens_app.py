@@ -1,5 +1,5 @@
 import time
-
+import numpy as np
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
@@ -178,7 +178,7 @@ def run_drift_detection_background_thread(form_parameters):
         selected_number_of_windows = int(form_parameters["number_of_windows_periodic_drift"])
         selected_latency = int(form_parameters["latency_periodic_drift"])
         selected_drift_offset = int(form_parameters["drift_offset_periodic_drift"])
-        selected_drift_duration = int(form_parameters["drift_percentage_periodic_drift"])
+        selected_drift_duration = int(form_parameters["drift_duration_periodic_drift"])
         selected_drift_percentage = int(form_parameters["drift_percentage_periodic_drift"]) / 100
 
 
@@ -191,6 +191,9 @@ def run_drift_detection_background_thread(form_parameters):
             flag_shuffle=flag_shuffle,
             flag_replacement=flag_replacement,
             socketio=socketio)
+
+        for y in Y_original_windows:
+            print(np.count_nonzero(y == 3))
 
     for i, (E_w, y_pred, y_true) in enumerate(zip(E_windows, Y_predicted_windows, Y_original_windows)):
         window_distance = dl.compute_window_distribution_distances(E_w, y_pred)

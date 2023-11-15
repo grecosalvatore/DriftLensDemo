@@ -15,6 +15,7 @@ It performs distribution distances between a historical dataset, called baseline
 - [Methodology and Models](#methodology-and-models)
 - [DriftLens Demo](#demo)
   - [Screenshots](#screenshots)
+- [Setup](#setup)
 - [References](#references)
 - [People involved](#people-behind-driftlens)
 
@@ -26,6 +27,27 @@ The Drift Detection methodology in DriftLens includes two main phases: an *offli
 The *offline* phase takes as input an historical dataset, called baseline, that represents what the model learned during training. Firstly, the baseline data is feed into the model to extract the embedding vectors and the predicted labels 
 &#x2460;. Then, the majority of the baseline dataset is used to model the distributions of the baseline &#x2461;. Instead, a small portion of the baseline data is used to estimate the threshold values &#x2462;
 ## Online Phase
+
+# Setup
+To use the tool locally:
+1) Create and Start a new environment:
+```sh
+conda create -n driftlens-demo-env python=3.8 anaconda
+conda activate driftlens-demo-env
+```
+2) Install the required packages:
+```sh
+pip install -r requirements.txt
+```
+3) Download the pre-computed embedding in the tool (TODO):
+```sh
+./download_data.sh 
+```
+4) Start the DriftLens app locally:
+```py
+python driftlens_app.py
+```
+The DriftLens app will run on localhost: http://127.0.0.1:5000
 
 # References
 ```bibtex

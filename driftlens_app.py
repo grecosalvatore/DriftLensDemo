@@ -57,15 +57,6 @@ def get_datasets_models_and_window_sizes():
 
     return datasets
 
-"""
-Generate random sequence of dummy sensor values and send it to our clients
-"""
-def background_thread():
-    print("Generating random sensor values")
-    while True:
-        dummy_sensor_value = round(random() * 100, 3)
-        socketio.emit('updateSensorData', {'value': dummy_sensor_value, "date": get_current_datetime()})
-        socketio.sleep(1)
 
 @app.route("/use_cases")
 def use_cases():
@@ -206,7 +197,6 @@ def run_drift_detection_background_thread(form_parameters):
         print(f"window: {i} - {window_distance}")
 
         per_label_distances = ",".join(str(v) for k,v in window_distance["per-label"].items())
-        #yield f"data: {json.dumps(window_distance)}\n\n"
         print(window_distance["per-label"])
         socketio.emit('updateSensorData', {'batch_distance': window_distance["batch"], "per_label_distances":per_label_distances , "date": get_current_datetime()})
         socketio.sleep(selected_latency/1000)

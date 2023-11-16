@@ -277,6 +277,11 @@ Drift: Simulated with one new class label: Science/Tech</td>
             <label for="threshold_sensitivity">Threshold Sensitivity:</label>
             <input type="range" id="threshold_sensitivity" name="threshold_sensitivity" min="0" max="5" step="0.1" value="1">
             <output for="threshold_sensitivity">1</output>
+            <br>
+            <label for="batch_threshold">Computed Batch Threshold Value:</label>
+            <output id="batch_threshold">0</output> <!-- Initial value can be set based on default threshold sensitivity -->
+            <input type="hidden" id="hidden_batch_threshold" name="hidden_batch_threshold" value="0">
+            <br>
         <br>
         <div class="threshold-chart-container">
             <canvas id="thresholdChartPerBatch" width="100" height="100"></canvas>
@@ -318,6 +323,7 @@ Drift: Simulated with one new class label: Science/Tech</td>
     var threshold_configuration_container = document.getElementById("threshold_configuration_container")
     var threshold_sensitivity = document.getElementById("threshold_sensitivity")
 
+
     // Convert the datasets variable from JSON format
     var datasets = JSON.parse('{{ data|tojson|safe }}');
 
@@ -325,9 +331,6 @@ Drift: Simulated with one new class label: Science/Tech</td>
     var chartInstanceBatch;
     var chartInstanceLabel;
     var thresholdBatchData = [];
-
-
-
 
     datasetDropdown.addEventListener("change", function() {
         // Clear existing options in the model and window size dropdowns
@@ -391,6 +394,11 @@ Drift: Simulated with one new class label: Science/Tech</td>
             driftPatternDropdown.removeAttribute("disabled");
         }
     }
+
+    function roundToTwo(num) {
+        return +(Math.round(num + "e+2")  + "e-2");
+    }
+
 
     windowSizeDropdown.addEventListener("change", function() {
         threshold_configuration_container.style.display = "block";
@@ -547,6 +555,10 @@ Drift: Simulated with one new class label: Science/Tech</td>
             chartInstanceBatch.update();
         }
 
+        var batchThresholdValue = maxValue;
+        document.getElementById('batch_threshold').textContent = roundToTwo(batchThresholdValue);
+        document.getElementById("hidden_batch_threshold").value = roundToTwo(batchThresholdValue);
+
         // Similar logic for chartInstanceLabel if needed
     });
     // Additional input validation and event listeners for other drift patterns (Incremental Drift, Periodic Drift) can be added similarly.
@@ -632,11 +644,24 @@ Drift: Simulated with one new class label: Science/Tech</td>
         chart.update();
     }
 
+
+    function update_default_batch_threshold(qValue){
+        const q = quantile(thresholdBatchData, qValue);
+        const filteredData = thresholdBatchData.filter(x => x < q);
+        var maxValue = Math.max(...filteredData);
+        console.log("max value" + maxValue)
+        document.getElementById('batch_threshold').textContent = roundToTwo(maxValue);
+        document.getElementById("hidden_batch_threshold").value = roundToTwo(maxValue);
+
+    };
+
     document.getElementById('window_size').addEventListener('change', function() {
         var selectedWindowSize = this.value;
         var selectedModel = modelDropdown.value;
         var selectedDataset = datasetDropdown.value;
+        var thresholdSensitivity = threshold_sensitivity.value;
         var queryUrl = `/get_threshold_values?dataset=${selectedDataset}&model=${selectedModel}&window_size=${selectedWindowSize}`;
+        var qValue = parseFloat(thresholdSensitivity);
 
         fetch(queryUrl)
             .then(response => response.json())
@@ -650,8 +675,12 @@ Drift: Simulated with one new class label: Science/Tech</td>
                     updateChartData(chartInstanceBatch, data);
                     updateChartData(chartInstanceLabel, data);
                 }
+                console.log("Updating batch th with :", qValue);
+                update_default_batch_threshold(qValue)
             })
             .catch(error => console.error('Error fetching data:', error));
+
+
     });
 
     threshold_sensitivity.addEventListener("input", function() {

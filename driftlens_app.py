@@ -88,8 +88,8 @@ def run_drift_detection_background_thread(form_parameters):
     selected_model = form_parameters['model']
     selected_window_size = int(form_parameters['window_size'])
     selected_drift_pattern = form_parameters['drift_pattern']
-    selected_threshold_sensitivity = form_parameters['threshold_sensitivity']
-    print("Selected Threshold", selected_threshold_sensitivity)
+    selected_batch_threshold = float(form_parameters['hidden_batch_threshold'])
+    print("Selected batch Threshold", selected_batch_threshold)
     # Load Embedding
     new_unseen_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/new_unseen_embedding.hdf5"
     drifted_embedding_path = f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}/saved_embeddings/drifted_embedding.hdf5"
@@ -191,8 +191,7 @@ def run_drift_detection_background_thread(form_parameters):
         if isinstance(window_distance["batch"], complex):
             window_distance["batch"] = float(_utils.clear_complex_number(window_distance["batch"]).real)
 
-        th = 2
-        if window_distance["batch"] > th:
+        if window_distance["batch"] > selected_batch_threshold:
             batch_drift_prediction = 1
         else:
             batch_drift_prediction = 0

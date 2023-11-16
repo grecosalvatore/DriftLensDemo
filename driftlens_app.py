@@ -12,6 +12,7 @@ from utils import _utils
 import h5py
 import json
 import os
+import yaml
 """
 Background Thread
 """
@@ -80,10 +81,10 @@ def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name
             else:
                 Y_predicted = hf[Y_predicted_name][()]
     else:
-        raise Exception("Experiment Manager: Error in loading the embedding file. Please set the embedding paths in the configuration file.")
+        raise Exception("Error in loading the embedding file.")
     return E, Y_original, Y_predicted
 
-def run_drift_detection_background_thread(form_parameters):
+def run_drift_detection_background_thread(form_parameters, config_dict):
     selected_dataset = form_parameters['dataset']
     selected_model = form_parameters['model']
     selected_window_size = int(form_parameters['window_size'])
@@ -97,14 +98,17 @@ def run_drift_detection_background_thread(form_parameters):
     E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
     E_drift, Y_original_drift, Y_predicted_drift = load_embedding(drifted_embedding_path)
 
-    # TODO: labels list is currently hard coded
-    training_label_list = [0, 1, 2]
-    drift_label_list = [3]
-    wg = WindowsGenerator(training_label_list, drift_label_list, E_new_unseen, Y_predicted_new_unseen,
+    training_labels_id_list = config_dict["training_labels_id_list"]
+    training_labels_names_list = config_dict["training_labels_name_list"]
+    drift_labels_id_list = config_dict["drift_labels_id_list"]
+    drift_labels_names_list = config_dict["drift_labels_name_list"]
+
+
+    wg = WindowsGenerator(training_labels_id_list, drift_labels_id_list, E_new_unseen, Y_predicted_new_unseen,
                           Y_original_new_unseen, E_drift, Y_predicted_drift, Y_original_drift)
 
     # Create DriftLens Object
-    dl = DriftLens(training_label_list)
+    dl = DriftLens(training_labels_id_list)
 
     print("Loading Baseline")
     dl.load_baseline(folderpath=f"static/use_cases/datasets/{selected_dataset}/models/{selected_model}", baseline_name="baseline")
@@ -196,7 +200,7 @@ def run_drift_detection_background_thread(form_parameters):
         else:
             batch_drift_prediction = 0
 
-        for l in training_label_list:
+        for l in training_labels_id_list:
             if isinstance(window_distance["per-label"][str(l)], complex):
                 print("clearing:", window_distance["per-label"][str(l)])
                 window_distance["per-label"][str(l)] = float(_utils.clear_complex_number(window_distance["per-label"][str(l)]).real)
@@ -218,13 +222,20 @@ def drift_lens_monitor():
     global thread
     print('Client connected')
 
+    config_file_path = f'static/use_cases/datasets/{all_parameters["dataset"]}/config.yml'
+    if os.path.exists(config_file_path):
+        with open(config_file_path) as f:
+            config_dict = yaml.safe_load(f)
+
+    training_labels_names_list = config_dict["training_labels_name_list"]
+
     global thread
     with thread_lock:
         if thread is None:
             #thread = socketio.start_background_task(background_thread)
-            thread = socketio.start_background_task(run_drift_detection_background_thread, all_parameters)
+            thread = socketio.start_background_task(run_drift_detection_background_thread, all_parameters, config_dict)
 
-    return render_template('drift_lens_monitor.html', title=title, num_labels=3, label_names=",".join(["label1", "label2", "label3"]))
+    return render_template('drift_lens_monitor.html', title=title, num_labels=3, label_names=",".join(training_labels_names_list))
 
 
 """

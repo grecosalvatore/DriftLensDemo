@@ -95,13 +95,13 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td rowspan="2">STL</td>
       <td rowspan="2">Computer Vision</td>
       <td>VGG16</td>
-      <td>??</td>
+      <td>0.89</td>
       <td rowspan="2"></td>
     </tr>
     <tr>
       <th>3.2</th>
       <td>VisionTransformer</td>
-      <td>??</td>
+      <td>0.90</td>
     </tr>
     <tr class="separator">
       <td></td>
@@ -116,13 +116,13 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td rowspan="2">STL</td>
       <td rowspan="2">Computer Vision</td>
       <td>VGG16</td>
-      <td>??</td>
+      <td>0.82</td>
       <td rowspan="2"></td>
     </tr>
     <tr>
       <th>4.2</th>
       <td>VisionTransformer</td>
-      <td>??</td>
+      <td>0.96</td>
     </tr>
     <tr class="separator">
       <td></td>

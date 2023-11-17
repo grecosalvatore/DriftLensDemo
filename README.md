@@ -42,9 +42,9 @@ The Drift Detection methodology in DriftLens includes two main phases: an *offli
       <td rowspan="3">Text</td>
       <td>BERT</td>
       <td>0.98</td>
-      <td rowspan="3"> Task: Topic Classification. <BR>
-Training Labels: World, Business, and Sport <BR>
-Drift: Simulated with one new class label: Science/Tech</td>
+      <td rowspan="3"> <b>Task</b>: Topic Classification. <BR>
+<b>Training Labels</b>: <i>World</i>, <i>Business</i>, and <i>Sport</i> <BR>
+<b>Drift</b>: Simulated with one new class label: <i>Science/Tech</i></td>
     </tr>
     <tr>
       <th>1.2</th>
@@ -96,9 +96,9 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td rowspan="2">Computer Vision</td>
       <td>VGG16</td>
       <td>0.89</td>
-      <td rowspan="2"> Task: Image Classification. <BR>
-Training Labels: Forest, Glacier, Mountain, Building, Street <BR>
-Drift: Simulated with one new class label: Sea</td>
+      <td rowspan="2"> <b>Task</b>: Image Classification. <BR>
+<b>Training Labels</b>: <i>Forest</i>, <i>Glacier</i>, <i>Mountain</i>, <i>Building</i>, <i>Street</i> <BR>
+<b>Drift</b>: Simulated with one new class label: <i>Sea</i></td>
     </tr>
     <tr>
       <th>3.2</th>
@@ -119,9 +119,9 @@ Drift: Simulated with one new class label: Sea</td>
       <td rowspan="2">Computer Vision</td>
       <td>VGG16</td>
       <td>0.82</td>
-      <td rowspan="2"> Task: Image Classification. <BR>
-Training Labels: Airplane, Bird,Car, Cat, Deer, Dog, Horse, Monkey, Ship <BR>
-Drift: Simulated with one new class label: Truck</td>
+      <td rowspan="2"> <b>Task</b>: Image Classification. <BR>
+<b>Training Labels</b>: <i>Airplane</i>, <i>Bird</i>, <i>Car</i>, <i>Cat</i>, <i>Deer</i>, <i>Dog</i>, <i>Horse</i>, <i>Monkey</i>, <i>Ship</i> <BR>
+<b>Drift</b>: Simulated with one new class label: <i>Truck</i></td>
     </tr>
     <tr>
       <th>4.2</th>

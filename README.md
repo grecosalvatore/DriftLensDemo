@@ -92,11 +92,13 @@ Drift: Simulated with one new class label: Science/Tech</td>
     </tr>
   <tr>
       <th>3.1</th>
-      <td rowspan="2">STL</td>
+      <td rowspan=2">STL</td>
       <td rowspan="2">Computer Vision</td>
       <td>VGG16</td>
       <td>0.89</td>
-      <td rowspan="2"></td>
+      <td rowspan="2"> Task: Image Classification. <BR>
+Training Labels: Forest, Glacier, Mountain, Building, Street <BR>
+Drift: Simulated with one new class label: Sea</td>
     </tr>
     <tr>
       <th>3.2</th>
@@ -117,7 +119,9 @@ Drift: Simulated with one new class label: Science/Tech</td>
       <td rowspan="2">Computer Vision</td>
       <td>VGG16</td>
       <td>0.82</td>
-      <td rowspan="2"></td>
+      <td rowspan="2"> Task: Image Classification. <BR>
+Training Labels: Airplane, Bird,Car, Cat, Deer, Dog, Horse, Monkey, Ship <BR>
+Drift: Simulated with one new class label: Truck</td>
     </tr>
     <tr>
       <th>4.2</th>

@@ -4,9 +4,10 @@ document.addEventListener("DOMContentLoaded", function () {
   let loaderText = document.querySelector(".loader-text");
   let hero = document.querySelector(".hero");
   let currentCount = 0; // Initialize the counter
-
+  let driftPredictions = []; // Initialize an array to store drift predictions
   const ctx = document.getElementById("myChart").getContext("2d");
   const ctx_per_label = document.getElementById("myChart_per_label").getContext("2d");
+
 
   const myChart = new Chart(ctx, {
     type: "line",
@@ -43,8 +44,11 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
+
   const numLabels = parseInt($("#num_labels").data("num-labels")); // Get the number of labels from the HTML
   const labelNames = $("#label_names").data("label-names").split(","); // Get label names from the HTML and split into an array
+
+
 
   const myChart_per_label = new Chart(ctx_per_label, {
     type: "line",
@@ -130,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   function addData(label, batch_distance, per_label_distances, batch_drift_prediction) {
-    myChart.data.labels.push(label);
+
 
     // Update main dataset
     myChart.data.datasets[0].data.push(batch_distance);
@@ -138,15 +142,23 @@ document.addEventListener("DOMContentLoaded", function () {
     // Update drift dataset
     if (batch_drift_prediction === 1) {
         // If drift is predicted, add the batch distance to the drift dataset
+        myChart.data.labels.push("\u26A0\uFE0F" + label);
+        driftPredictions.push(1);
         myChart.data.datasets[1].data.push(batch_distance);
     } else {
         // If no drift, add null to maintain alignment
+        myChart.data.labels.push(label);
+        driftPredictions.push(0);
         myChart.data.datasets[1].data.push(null);
     }
 
     // Update per-label chart
     const perLabelValues = per_label_distances.split(",").map(Number);
-    myChart_per_label.data.labels.push(label);
+    if (batch_drift_prediction === 1) {
+      myChart_per_label.data.labels.push("\u26A0\uFE0F" + label);
+    } else{
+      myChart_per_label.data.labels.push(label);
+    }
     myChart_per_label.data.datasets.forEach((dataset, i) => {
         dataset.data.push(perLabelValues[i]);
     });
@@ -206,6 +218,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (myChart.data.labels.length > MAX_DATA_COUNT) {
       removeFirstData();
     }
-    addData(msg.date + " w" + msg.window_id, msg.batch_distance, msg.per_label_distances, msg.batch_drift_prediction);
+    addData( "Win " + msg.window_id + " - " + msg.date, msg.batch_distance, msg.per_label_distances, msg.batch_drift_prediction);
   });
 });

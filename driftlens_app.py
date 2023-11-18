@@ -28,7 +28,8 @@ Get current date time
 """
 def get_current_datetime():
     now = datetime.now()
-    return now.strftime("%m/%d/%Y %H:%M:%S")
+    #return now.strftime("%m/%d/%Y %H:%M:%S")
+    return now.strftime("%H:%M:%S")
 
 def get_datasets_models_and_window_sizes():
     base_directory = "static/use_cases/datasets"

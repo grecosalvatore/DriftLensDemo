@@ -59,11 +59,11 @@ def get_datasets_models_and_window_sizes():
     return datasets
 
 
-@app.route("/use_cases")
-def use_cases():
+@app.route("/run_our_drift_experiment")
+def run_our_drift_experiment():
     title = 'DriftLens'
     available_data = get_datasets_models_and_window_sizes()
-    return render_template('use_cases.html', title=title, data=available_data)
+    return render_template('run_our_drift_experiment.html', title=title, data=available_data)
 
 def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name=None):
     if filepath is not None:
@@ -245,9 +245,9 @@ Serve root index file
 def index():
     return render_template('index.html')
 
-@app.route('/upload_use_case')
-def upload_use_case():
-    return render_template('upload_use_case.html')
+@app.route('/run_your_drift_experiment')
+def run_your_drift_experiment():
+    return render_template('run_your_drift_experiment.html')
 
 @app.route('/get_threshold_values', methods=["GET", "POST"])
 def get_threshold_values():

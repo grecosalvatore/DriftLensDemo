@@ -7,19 +7,25 @@
     <br><br>
     Model name: <input type="text" id="model-name" name="model" placeholder="Enter model name" onkeyup="checkInputs()">
     <br><br><br>
-    Baseline Data: <input type="file" class="upload-btn" id="baseline-upload" accept=".hdf5" disabled onchange="uploadData('baseline')">
-    <br><br>
-    Threshold Data: <input type="file" class="upload-btn" id="threshold-upload" accept=".hdf5" disabled onchange="uploadData('threshold')">
-    <br><br>
-    New Data: <input type="file" class="upload-btn" id="newdata-upload" accept=".hdf5" disabled onchange="uploadData('newdata')">
-    <br><br>
-    Drift Data: <input type="file" class="upload-btn" id="drift-upload" accept=".hdf5" disabled onchange="uploadData('drift')">
+    <div class="input-group">
+        Baseline Data: <input type="file" class="upload-btn" id="baseline-upload" accept=".hdf5" disabled onchange="handleFileSelect(event, 'baseline')">
+        <button type="button" id="compute-baseline-btn" disabled>Compute Baseline</button>
+    </div>
+    <br>
+
+    <div class="input-group">
+        Threshold Data: <input type="file" class="upload-btn" id="threshold-upload" accept=".hdf5" disabled onchange="handleFileSelect(event, 'threshold')">
+        <button type="button" id="estimate-threshold-btn" disabled>Estimate Threshold</button>
+    </div>
+    <br>
+
+    Data Stream: <input type="file" class="upload-btn" id="datastream-upload" accept=".hdf5" disabled onchange="handleFileSelect(event, 'datastream')">
     <br><br><br>
-    <button type="submit" id="submit-btn" disabled>Submit</button>
+    <button type="submit" id="submit-btn" disabled>Upload Data</button>
 </form>
 
 <script type="text/javascript">
-    let uploadsCompleted = { baseline: false, threshold: false, newdata: false, drift: false };
+    let uploadsInProgress = { baseline: false, threshold: false, datastream: false };
 
     function checkInputs() {
         var dataset = document.getElementById('dataset-name').value;
@@ -34,40 +40,17 @@
         checkSubmitButton();
     }
 
-    function uploadData(type) {
-        // Update the code here to handle the file upload process
-        console.log('Uploading ' + type);
-        uploadsCompleted[type] = true;
-
-        // Check if all uploads are completed
-        checkSubmitButton();
-    }
-
-    function checkSubmitButton() {
-        var allUploadsCompleted = Object.values(uploadsCompleted).every(status => status === true);
-        var datasetFilled = document.getElementById('dataset-name').value !== '';
-        var modelFilled = document.getElementById('model-name').value !== '';
-
-        document.getElementById('submit-btn').disabled = !(allUploadsCompleted && datasetFilled && modelFilled);
-    }
-
-function handleSubmit(event) {
-    event.preventDefault();
-    var files = [
-        document.getElementById('baseline-upload').files[0],
-        document.getElementById('threshold-upload').files[0],
-        document.getElementById('newdata-upload').files[0],
-        document.getElementById('drift-upload').files[0]
-    ];
-
-    files.forEach(file => {
+    function handleFileSelect(event, uploadType) {
+        const file = event.target.files[0];
         if (file) {
-            chunkAndUploadFile(file);
+            chunkAndUploadFile(file, uploadType);
+            uploadsInProgress[uploadType] = true;
+            updateUIForUpload(uploadType, true);
+            checkSubmitButton();
         }
-    });
-}
+    }
 
-function chunkAndUploadFile(file) {
+async function chunkAndUploadFile(file, uploadType) {
     const chunkSize = 5 * 1024 * 1024; // e.g., 5MB
     let start = 0;
 
@@ -76,14 +59,18 @@ function chunkAndUploadFile(file) {
         let chunk = file.slice(start, end);
         let formData = new FormData();
         formData.append('fileChunk', chunk, file.name);
-        // You might want to append additional data to identify the chunk number or total chunks
+        formData.append('uploadType', uploadType);
 
-        fetch('/upload_chunk', {
+        // Add model name and dataset name to form data
+        formData.append('modelName', document.getElementById('model-name').value);
+        formData.append('datasetName', document.getElementById('dataset-name').value);
+
+        await fetch('/upload_chunk', {
             method: 'POST',
             body: formData
         }).then(response => response.json())
           .then(data => {
-            console.log(data.message); // You can update the UI to show progress here
+            console.log(data.message);
           })
           .catch(error => {
             console.error('Error:', error);
@@ -91,7 +78,30 @@ function chunkAndUploadFile(file) {
 
         start = end;
     }
+
+    uploadsInProgress[uploadType] = false;
+    updateUIForUpload(uploadType, false);
+    checkSubmitButton();
 }
+
+
+    function updateUIForUpload(uploadType, isUploading) {
+        // Implement UI changes during upload, such as disabling inputs or showing progress indicators
+    }
+
+    function checkSubmitButton() {
+        var allUploadsCompleted = Object.values(uploadsInProgress).every(status => status === false);
+        var datasetFilled = document.getElementById('dataset-name').value !== '';
+        var modelFilled = document.getElementById('model-name').value !== '';
+
+        document.getElementById('submit-btn').disabled = !(allUploadsCompleted && datasetFilled && modelFilled);
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        // Handle form submission logic here
+    }
+
 
 </script>
 {% endblock %}

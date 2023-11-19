@@ -248,7 +248,11 @@ def index():
 
 @app.route('/run_your_drift_experiment')
 def run_your_drift_experiment():
-    return render_template('run_your_drift_experiment.html')
+    timestamp = int(time.time())
+    session_dir = os.path.join('static', 'new_use_cases', 'tmp', str(timestamp))
+    data_dir = os.path.join(session_dir, 'data')
+    os.makedirs(data_dir, exist_ok=True)
+    return render_template('run_your_drift_experiment.html', data_dir=data_dir)
 
 @app.route('/get_threshold_values', methods=["GET", "POST"])
 def get_threshold_values():
@@ -267,16 +271,50 @@ def get_threshold_values():
     return jsonify(data_list)
 
 
-
-
 @app.route('/upload_chunk', methods=['POST'])
-def upload_chunk():
+def upload_chunk(data_dir):
     chunk = request.files['fileChunk']
+    upload_type = request.form['uploadType']
+    dataset = request.form['datasetName']
+    model = request.form['modelName']
+    print(request.form['datasetName'])
     filename = secure_filename(chunk.filename)
-    # Add logic to handle chunk (e.g., save to /tmp with a unique identifier)
-    # You may need to track the chunks to reassemble them later
+
+    # Define the full path for the file within the session directory
+    file_path = os.path.join(data_dir, f'{upload_type}.hdf5')
+
+    # Append the chunk to the file
+    with open(file_path, 'ab') as f:
+        f.write(chunk.read())
+
+    print("Uploaded chunk for", upload_type)
+
+    # Check if all chunks for the baseline are received
+    if upload_type == 'baseline':
+        # Combine all chunks into a single baseline file
+        combine_chunks(data_dir, 'baseline.hdf5')
 
     return jsonify(message="Chunk received")
+
+
+def combine_chunks(data_dir, output_filename):
+    # Get a list of all chunk files
+    chunk_files = [f for f in os.listdir(data_dir) if f.startswith('baseline_chunk_')]
+    chunk_files.sort()  # Sort to ensure correct order
+
+    # Combine all chunks into a single file
+    with open(os.path.join(data_dir, output_filename), 'ab') as output_file:
+        for chunk_file in chunk_files:
+            with open(os.path.join(data_dir, chunk_file), 'rb') as chunk:
+                output_file.write(chunk.read())
+
+    # Clean up the individual chunk files
+    for chunk_file in chunk_files:
+        os.remove(os.path.join(data_dir, chunk_file))
+
+    print("Combined baseline chunks into", output_filename)
+
+
 
 
 

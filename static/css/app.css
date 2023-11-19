@@ -118,3 +118,16 @@ footer {
     font-style: italic;
 }
 
+
+.input-group {
+    display: flex;
+    align-items: center; /* Vertically align items in the middle */
+    justify-content: flex-start; /* Align items to the start */
+    max-width: 800px; /* Adjust this value as needed */
+}
+
+.input-group input {
+    flex-grow: 1; /* Allow the input to grow and fill the space */
+    margin-right: 10px; /* Add some space between input and button */
+}
+

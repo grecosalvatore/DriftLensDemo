@@ -27,6 +27,14 @@
 <script type="text/javascript">
     let uploadsInProgress = { baseline: false, threshold: false, datastream: false };
 
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.getElementById('compute-baseline-btn').addEventListener('click', computeBaseline);
+    });
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.getElementById('estimate-threshold-btn').addEventListener('click', estimateThreshold);
+    });
+
     function checkInputs() {
         var dataset = document.getElementById('dataset-name').value;
         var model = document.getElementById('model-name').value;
@@ -50,52 +58,110 @@
         }
     }
 
-async function chunkAndUploadFile(file, uploadType) {
-    const chunkSize = 5 * 1024 * 1024; // e.g., 5MB
-    let start = 0;
+    async function computeBaseline() {
+        // Prepare data to be sent, such as dataset and model names
+        let data = {
+            datasetName: document.getElementById('dataset-name').value,
+            modelName: document.getElementById('model-name').value
+        };
 
-    while (start < file.size) {
-        let end = Math.min(start + chunkSize, file.size);
-        let chunk = file.slice(start, end);
-        let formData = new FormData();
-        formData.append('fileChunk', chunk, file.name);
-        formData.append('uploadType', uploadType);
+        // Send the request to your server
+        try {
+            let response = await fetch('/compute_baseline', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
 
-        // Add model name and dataset name to form data
-        formData.append('modelName', document.getElementById('model-name').value);
-        formData.append('datasetName', document.getElementById('dataset-name').value);
-
-        await fetch('/upload_chunk', {
-            method: 'POST',
-            body: formData
-        }).then(response => response.json())
-          .then(data => {
-            console.log(data.message);
-          })
-          .catch(error => {
+            if (response.ok) {
+                let result = await response.json();
+                console.log('Compute Baseline Result:', result);
+                // Handle the response data here
+            } else {
+                console.error('Server returned error:', response.statusText);
+            }
+        } catch (error) {
             console.error('Error:', error);
-          });
-
-        start = end;
+        }
     }
 
-    uploadsInProgress[uploadType] = false;
-    updateUIForUpload(uploadType, false);
+    async function estimateThreshold() {
+        // Prepare data to be sent, such as dataset and model names
+        let data = {
+            datasetName: document.getElementById('dataset-name').value,
+            modelName: document.getElementById('model-name').value
+        };
 
-    // Check if the completed upload is for baseline data
-    if (uploadType === 'baseline') {
-        document.getElementById('compute-baseline-btn').disabled = false;
+        // Send the request to your server
+        try {
+            let response = await fetch('/estimate_threshold', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                let result = await response.json();
+                console.log('Estimate Threshol Result:', result);
+                // Handle the response data here
+            } else {
+                console.error('Server returned error:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
-    // Check if the completed upload is for threshold data
-    if (uploadType === 'threshold') {
-        document.getElementById('estimate-threshold-btn').disabled = false;
+    async function chunkAndUploadFile(file, uploadType) {
+        const chunkSize = 5 * 1024 * 1024; // e.g., 5MB
+        let start = 0;
+
+        while (start < file.size) {
+            let end = Math.min(start + chunkSize, file.size);
+            let chunk = file.slice(start, end);
+            let formData = new FormData();
+            formData.append('fileChunk', chunk, file.name);
+            formData.append('uploadType', uploadType);
+
+            // Add model name and dataset name to form data
+            formData.append('modelName', document.getElementById('model-name').value);
+            formData.append('datasetName', document.getElementById('dataset-name').value);
+
+            await fetch('/upload_chunk', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(data => {
+                console.log(data.message);
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+
+            start = end;
+        }
+
+        uploadsInProgress[uploadType] = false;
+        updateUIForUpload(uploadType, false);
+
+        // Check if the completed upload is for baseline data
+        if (uploadType === 'baseline') {
+            document.getElementById('compute-baseline-btn').disabled = false;
+        }
+
+        // Check if the completed upload is for threshold data
+        if (uploadType === 'threshold') {
+            document.getElementById('estimate-threshold-btn').disabled = false;
+        }
+
+
+
+        checkSubmitButton();
     }
-
-
-
-    checkSubmitButton();
-}
 
 
     function updateUIForUpload(uploadType, isUploading) {

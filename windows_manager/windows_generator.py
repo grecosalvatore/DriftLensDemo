@@ -72,7 +72,7 @@ class WindowsGenerator:
         return E_windows, Y_predicted_windows, Y_original_windows
 
 
-    def balanced_without_drift_windows_generation(self, window_size, n_windows, flag_shuffle=True, flag_replacement=False, socketio=None):
+    def balanced_without_drift_windows_generation(self, window_size, n_windows, flag_shuffle=True, flag_replacement=False, socketio=None, update_progressbar=True):
 
         if bool(flag_shuffle):
             self.shuffle_datasets()
@@ -85,7 +85,8 @@ class WindowsGenerator:
                                                                                      n_windows,
                                                                                      flag_replacement,
                                                                                      socketio,
-                                                                                     total_windows_progressbar=n_windows)
+                                                                                     total_windows_progressbar=n_windows,
+                                                                                     update_progressbar=update_progressbar)
         for i in range(n_windows):
             E_windows[i], Y_predicted_windows[i], Y_original_windows[i] = self._shuffle_dataset(E_windows[i],
                                                                                                 Y_predicted_windows[i],

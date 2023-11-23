@@ -8,11 +8,13 @@ from threading import Lock
 from datetime import datetime
 from windows_manager.windows_generator import WindowsGenerator
 from drift_lens.drift_lens import DriftLens
+import drift_lens._baseline as _baseline
 from utils import _utils
 import h5py
 import json
 import os
 import yaml
+import shutil
 """
 Background Thread
 """
@@ -270,6 +272,85 @@ def get_threshold_values():
     data_list = np.load(f"static/use_cases/datasets/{dataset}/models/{model}/window_sizes/{window_size}/thresholds/th_batch.npy").tolist()
     return jsonify(data_list)
 
+
+@app.route('/compute_baseline', methods=['POST'])
+def compute_baseline():
+    baseline_embedding_path = f"static/new_use_cases/tmp/baseline.hdf5"
+    batch_n_pc = 150
+    per_label_n_pc = 75
+    E_baseline, Y_original_baseline, Y_predicted_baseline = load_embedding(baseline_embedding_path)
+    label_list = sorted(list(set(Y_predicted_baseline)))
+    label_list = [int(l) for l in label_list]
+    baseline_estimator = _baseline.StandardBaselineEstimator(label_list, batch_n_pc, per_label_n_pc)
+    baseline = baseline_estimator.estimate_baseline(E_baseline, Y_predicted_baseline)
+    baseline_path = f"static/new_use_cases/tmp"
+    baseline_path = baseline.save(baseline_path, "baseline")
+    return jsonify(message="Baseline Estimated")
+
+@app.route('/estimate_threshold', methods=['POST'])
+def estimate_threshold():
+
+
+    threshold_embedding_path = f"static/new_use_cases/tmp/threshold.hdf5"
+    batch_n_pc = 150
+    per_label_n_pc = 75
+    training_label_list = [0, 1, 2]
+    E_th, Y_original_th, Y_predicted_th = load_embedding(threshold_embedding_path)
+    base_path = f"static/new_use_cases/tmp"
+    dl = DriftLens(training_label_list)
+    dl.load_baseline(base_path, "baseline")
+
+    wg = WindowsGenerator(training_label_list,
+                          [-1],
+                          E_th,
+                          Y_predicted_th,
+                          Y_original_th,
+                          E_th,
+                          Y_predicted_th,
+                          Y_original_th)
+
+    per_batch_distances = []
+    per_label_distances = {label: [] for label in training_label_list}
+
+    for i in range(100):
+        E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_without_drift_windows_generation(
+            window_size=2000,
+            n_windows=1,
+            flag_shuffle=True,
+            flag_replacement=True,
+            update_progressbar=False
+        )
+
+        distribution_distances = dl.compute_window_list_distribution_distances(E_windows, Y_predicted_windows)
+
+        per_batch_distances.append(distribution_distances[0][0]["batch"])
+        for l in training_label_list:
+            per_label_distances[l].append(distribution_distances[0][0]["per-label"][str(l)])
+
+    per_batch_distances_arr = np.array(per_batch_distances)
+    indices = (-per_batch_distances_arr).argsort()
+    per_batch_distances_sorted = per_batch_distances_arr[indices]
+
+    for l in training_label_list:
+        per_label_distances[l] = sorted(per_label_distances[l], reverse=True)
+
+    th_path = os.path.join(base_path, "thresholds")
+
+    if not os.path.exists(th_path):
+        os.makedirs(th_path)
+    else:
+        shutil.rmtree(th_path)  # Removes all the subdirectories!
+        os.makedirs(th_path)
+
+
+    with open(os.path.join(th_path, "th_batch.npy"), 'wb') as f:
+        np.save(f, per_batch_distances_sorted)
+
+    for l in training_label_list:
+        with open(os.path.join(th_path, f'th_label_{l}.npy'), 'wb') as f:
+            np.save(f, per_label_distances[l])
+
+    return jsonify(message="Threshold Estimated")
 
 @app.route('/upload_chunk', methods=['POST'])
 def upload_chunk():

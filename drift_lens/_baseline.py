@@ -123,6 +123,8 @@ class BaselineClass:
         outfile = os.path.join(BASELINE_STATISTICS_FOLDER, "baseline_covariance_batch")
         np.save(outfile, self.covariance_matrices_dict["batch"])
 
+        print(self.label_list)
+
         baseline_info_dict = {"label_list": self.label_list, "per_label_n_pc": self.per_label_n_pc, "batch_n_pc": self.batch_n_pc,
                               "n_samples_dict": self.n_samples_dict, "description": self.description}
         try:

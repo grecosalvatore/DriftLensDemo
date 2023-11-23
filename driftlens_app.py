@@ -87,6 +87,55 @@ def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name
         raise Exception("Error in loading the embedding file.")
     return E, Y_original, Y_predicted
 
+
+def run_drift_detection_background_new_experiment_thread(form_parameters):
+    print("done")
+    new_unseen_embedding_path = f"static/new_use_cases/tmp/datastream.hdf5"
+    E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
+
+    dl = DriftLens([0, 1, 2])
+    dl.load_baseline(folderpath="static/new_use_cases/tmp/",
+                     baseline_name="baseline")
+
+    selected_batch_threshold = 2
+    training_labels_id_list = [0,1,2]
+    n_samples = len(Y_original_new_unseen)
+    window_size = 1000
+    n_windows = n_samples//window_size
+    E_windows = []
+    Y_predicted_windows = []
+    selected_latency = 0
+
+    for i in range(n_windows):
+        start_index = i*window_size
+        end_index = i * window_size + window_size
+        E_windows.append(E_new_unseen[start_index:end_index])
+        Y_predicted_windows.append(Y_original_new_unseen[start_index:end_index])
+
+    for i, (E_w, y_pred) in enumerate(zip(E_windows, Y_predicted_windows)):
+        window_distance = dl.compute_window_distribution_distances(E_w, y_pred)
+        window_distance["window_id"] = i
+        if isinstance(window_distance["batch"], complex):
+            window_distance["batch"] = float(_utils.clear_complex_number(window_distance["batch"]).real)
+
+        if window_distance["batch"] > selected_batch_threshold:
+            batch_drift_prediction = 1
+        else:
+            batch_drift_prediction = 0
+
+        for l in training_labels_id_list:
+            if isinstance(window_distance["per-label"][str(l)], complex):
+                print("clearing:", window_distance["per-label"][str(l)])
+                window_distance["per-label"][str(l)] = float(_utils.clear_complex_number(window_distance["per-label"][str(l)]).real)
+                print(window_distance["per-label"][str(l)])
+        print(f"window: {i} - {window_distance}")
+
+        per_label_distances = ",".join(str(v) for k,v in window_distance["per-label"].items())
+        print(window_distance["per-label"])
+        socketio.emit('updateDriftData', {'batch_distance': window_distance["batch"], "per_label_distances":per_label_distances ,
+                                           "date": get_current_datetime(), "batch_drift_prediction":batch_drift_prediction, "window_id":i})
+        socketio.sleep(selected_latency/1000)
+
 def run_drift_detection_background_thread(form_parameters, config_dict):
     selected_dataset = form_parameters['dataset']
     selected_model = form_parameters['model']
@@ -239,6 +288,35 @@ def drift_lens_monitor():
             thread = socketio.start_background_task(run_drift_detection_background_thread, all_parameters, config_dict)
 
     return render_template('drift_lens_monitor.html', title=title, num_labels=3, label_names=",".join(training_labels_names_list))
+
+
+@app.route("/drift_lens_monitor_new_experiment", methods=["GET", "POST"])
+def drift_lens_monitor_new_experiment():
+    title = 'DriftLens'
+
+    if request.method == "POST":
+        all_parameters = request.form.to_dict()
+    global thread
+    print('Client connected')
+
+    #config_file_path = f'static/use_cases/datasets/{all_parameters["dataset"]}/config.yml'
+    #if os.path.exists(config_file_path):
+    #    with open(config_file_path) as f:
+    #        config_dict = yaml.safe_load(f)
+
+    #training_labels_names_list = config_dict["training_labels_name_list"]
+    training_labels_names_list = ["world", "business", "sport"]
+
+    global thread
+    with thread_lock:
+        if thread is None:
+            #thread = socketio.start_background_task(background_thread)
+            thread = socketio.start_background_task(run_drift_detection_background_new_experiment_thread, all_parameters)
+
+    return render_template('drift_lens_monitor.html', title=title, num_labels=3, label_names=",".join(training_labels_names_list))
+
+
+
 
 
 """
@@ -402,25 +480,6 @@ def combine_chunks(data_dir, output_filename):
 
 
 
-
-
-
-"""
-Decorator for connect
-"""
-"""@socketio.on('connect')
-def connect():
-    global thread
-    print('Client connected')
-
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(background_thread)
-"""
-"""
-Decorator for disconnect
-"""
 @socketio.on('disconnect')
 def disconnect():
     print('Client disconnected',  request.sid)

@@ -2,7 +2,8 @@
 
 {% block content %}
 <h1>Run Drift Experiment on Your Data</h1>
-<form enctype="multipart/form-data" onsubmit="handleSubmit(event)">
+<!--<form enctype="multipart/form-data" action="/drift_lens_monitor" method="POST" onsubmit="handleSubmit(event)">-->
+    <form enctype="multipart/form-data" action="/drift_lens_monitor_new_experiment" method="POST">
     Dataset name: <input type="text" id="dataset-name" name="dataset" placeholder="Enter dataset name" onkeyup="checkInputs()">
     <br><br>
     Model name: <input type="text" id="model-name" name="model" placeholder="Enter model name" onkeyup="checkInputs()">
@@ -21,11 +22,15 @@
 
     Data Stream: <input type="file" class="upload-btn" id="datastream-upload" accept=".hdf5" disabled onchange="handleFileSelect(event, 'datastream')">
     <br><br><br>
-    <button type="submit" id="submit-btn" disabled>Upload Data</button>
+    <button type="submit" id="submit-btn" disabled>Run Experiment</button>
 </form>
 
 <script type="text/javascript">
     let uploadsInProgress = { baseline: false, threshold: false, datastream: false };
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.getElementById('compute-baseline-btn').addEventListener('click', computeBaseline);
+    });
 
     document.addEventListener('DOMContentLoaded', (event) => {
         document.getElementById('compute-baseline-btn').addEventListener('click', computeBaseline);
@@ -106,7 +111,7 @@
 
             if (response.ok) {
                 let result = await response.json();
-                console.log('Estimate Threshol Result:', result);
+                console.log('Estimate Threshold Result:', result);
                 // Handle the response data here
             } else {
                 console.error('Server returned error:', response.statusText);

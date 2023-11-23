@@ -272,14 +272,14 @@ def get_threshold_values():
 
 
 @app.route('/upload_chunk', methods=['POST'])
-def upload_chunk(data_dir):
+def upload_chunk():
     chunk = request.files['fileChunk']
     upload_type = request.form['uploadType']
     dataset = request.form['datasetName']
     model = request.form['modelName']
     print(request.form['datasetName'])
     filename = secure_filename(chunk.filename)
-
+    data_dir = "static/new_use_cases/tmp"
     # Define the full path for the file within the session directory
     file_path = os.path.join(data_dir, f'{upload_type}.hdf5')
 
@@ -293,7 +293,12 @@ def upload_chunk(data_dir):
     if upload_type == 'baseline':
         # Combine all chunks into a single baseline file
         combine_chunks(data_dir, 'baseline.hdf5')
-
+    elif upload_type == 'threshold':
+        # Combine all chunks into a single threshold file
+        combine_chunks(data_dir, 'threshold.hdf5')
+    elif upload_type == 'datastream':
+        # Combine all chunks into a single datastream file
+        combine_chunks(data_dir, 'datastream.hdf5')
     return jsonify(message="Chunk received")
 
 

@@ -81,13 +81,42 @@ async function chunkAndUploadFile(file, uploadType) {
 
     uploadsInProgress[uploadType] = false;
     updateUIForUpload(uploadType, false);
+
+    // Check if the completed upload is for baseline data
+    if (uploadType === 'baseline') {
+        document.getElementById('compute-baseline-btn').disabled = false;
+    }
+
+    // Check if the completed upload is for threshold data
+    if (uploadType === 'threshold') {
+        document.getElementById('estimate-threshold-btn').disabled = false;
+    }
+
+
+
     checkSubmitButton();
 }
 
 
     function updateUIForUpload(uploadType, isUploading) {
-        // Implement UI changes during upload, such as disabling inputs or showing progress indicators
+        // Select all input elements and buttons
+        /*var inputs = document.getElementsByTagName('input');
+        var buttons = document.getElementsByTagName('button');
+
+        // Disable or enable all inputs and buttons based on isUploading
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].disabled = isUploading;
+        }
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].disabled = isUploading;
+        }
+
+        // Special handling for the upload button of the current upload type
+        if (!isUploading) {
+            document.getElementById(uploadType + '-upload').disabled = false;
+        }*/
     }
+
 
     function checkSubmitButton() {
         var allUploadsCompleted = Object.values(uploadsInProgress).every(status => status === false);

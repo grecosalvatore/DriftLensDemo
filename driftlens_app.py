@@ -92,7 +92,7 @@ def run_drift_detection_background_new_experiment_thread(form_parameters):
     print("done")
     new_unseen_embedding_path = f"static/new_use_cases/tmp/datastream.hdf5"
     E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
-
+    print(E_new_unseen.shape)
     dl = DriftLens([0, 1, 2])
     dl.load_baseline(folderpath="static/new_use_cases/tmp/",
                      baseline_name="baseline")
@@ -353,6 +353,7 @@ def get_threshold_values():
 
 @app.route('/compute_baseline', methods=['POST'])
 def compute_baseline():
+    print("--- Computing Baseline")
     baseline_embedding_path = f"static/new_use_cases/tmp/baseline.hdf5"
     batch_n_pc = 150
     per_label_n_pc = 75
@@ -367,8 +368,7 @@ def compute_baseline():
 
 @app.route('/estimate_threshold', methods=['POST'])
 def estimate_threshold():
-
-
+    print("--- Estimating Threshold")
     threshold_embedding_path = f"static/new_use_cases/tmp/threshold.hdf5"
     batch_n_pc = 150
     per_label_n_pc = 75

@@ -4,22 +4,29 @@
 <h1>Run Drift Experiment on Your Data</h1>
 <!--<form enctype="multipart/form-data" action="/drift_lens_monitor" method="POST" onsubmit="handleSubmit(event)">-->
     <form enctype="multipart/form-data" action="/drift_lens_monitor_new_experiment" method="POST">
+    <br>
+    <h3>Use Case Selection</h3>
     Dataset name: <input type="text" id="dataset-name" name="dataset" placeholder="Enter dataset name" onkeyup="checkInputs()">
     <br><br>
     Model name: <input type="text" id="model-name" name="model" placeholder="Enter model name" onkeyup="checkInputs()">
-    <br><br><br>
+    <br><br>
+    <h3>Compute Baseline</h3>
     <div class="input-group">
         Baseline Data: <input type="file" class="upload-btn" id="baseline-upload" accept=".hdf5" disabled onchange="handleFileSelect(event, 'baseline')">
         <button type="button" id="compute-baseline-btn" disabled>Compute Baseline</button>
     </div>
     <br>
-
+    <h3>Estimate Threshold</h3>
     <div class="input-group">
         Threshold Data: <input type="file" class="upload-btn" id="threshold-upload" accept=".hdf5" disabled onchange="handleFileSelect(event, 'threshold')">
         <button type="button" id="estimate-threshold-btn" disabled>Estimate Threshold</button>
+        <br>
     </div>
     <br>
-
+    Window Size: <input type="range" id="window_size" name="window_size" min="100" max="2000" step="25" value="100" disabled>
+    <output id="window_size_output" for="window_size">100</output>
+    <br><br>
+    <h3>Run Drift Experiment</h3>
     Data Stream: <input type="file" class="upload-btn" id="datastream-upload" accept=".hdf5" disabled onchange="handleFileSelect(event, 'datastream')">
     <br><br><br>
     <button type="submit" id="submit-btn" disabled>Run Experiment</button>
@@ -27,6 +34,10 @@
 
 <script type="text/javascript">
     let uploadsInProgress = { baseline: false, threshold: false, datastream: false };
+
+    document.getElementById('window_size').addEventListener('input', function() {
+        document.getElementById('window_size_output').textContent = this.value;
+    });
 
     document.addEventListener('DOMContentLoaded', (event) => {
         document.getElementById('compute-baseline-btn').addEventListener('click', computeBaseline);
@@ -49,6 +60,9 @@
         for (var i = 0; i < uploadButtons.length; i++) {
             uploadButtons[i].disabled = !allFilled;
         }
+
+        // Enable the window size range input when both dataset and model are filled
+        document.getElementById('window_size').disabled = !allFilled;
 
         checkSubmitButton();
     }

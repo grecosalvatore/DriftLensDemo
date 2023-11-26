@@ -289,7 +289,6 @@
         <br>
         <div class="threshold-chart-container">
             <canvas id="thresholdChartPerBatch" width="100" height="100"></canvas>
-            <canvas id="thresholdChartPerLabel" width="100" height="100"></canvas>
         </div>
         </div>
         <br>
@@ -674,7 +673,6 @@
                 thresholdBatchData = data;
                 if (!chartInstanceBatch) {
                     chartInstanceBatch = createChart('thresholdChartPerBatch', data, 'Per-batch distances', 'rgb(75, 192, 192)');
-                    chartInstanceLabel = createChart('thresholdChartPerLabel', data, 'Per-label distances', 'rgb(192, 75, 192)');
                 } else {
                     updateChartData(chartInstanceBatch, data);
                     updateChartData(chartInstanceLabel, data);

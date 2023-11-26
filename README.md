@@ -70,7 +70,9 @@ The Drift Detection methodology in DriftLens includes two main phases: an *offli
       <td rowspan="3">Text</td>
       <td>BERT</td>
       <td>0.88</td>
-      <td rowspan="3"></td>
+      <td rowspan="3"><b>Task</b>: Topic Classification. <BR>
+<b>Training Labels</b>: <i>Technology</i>, <i>Sale-Ads</i>, <i>Politics</i>, <i>Religion</i>, <i>Science</i> <BR>
+<b>Drift</b>: Simulated with one new class label: <i>Recreation</i></td>
     </tr>
     <tr>
       <th>2.2</th>

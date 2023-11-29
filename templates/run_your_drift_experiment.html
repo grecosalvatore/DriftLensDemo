@@ -24,6 +24,7 @@
     </div>
     <br>
     Window Size: <input type="range" id="window_size" name="window_size" min="100" max="2000" step="25" value="100" disabled>
+    <input type="hidden" id="hidden_window_size" name="hidden_window_size" value="100">
     <output id="window_size_output" for="window_size">100</output>
     <br>
     <div id="threshold_configuration_container" style="display: none;">
@@ -53,6 +54,12 @@
     document.getElementById('threshold_sensitivity').addEventListener("input", function() {
         var outputElement = this.nextElementSibling;
         outputElement.textContent = this.value;
+    });
+
+    document.getElementById('window_size').addEventListener('input', function() {
+        document.getElementById('window_size_output').textContent = this.value;
+        // Update the hidden field as well
+        document.getElementById('hidden_window_size').value = this.value;
     });
 
     document.getElementById('threshold_sensitivity').addEventListener("change", function() {

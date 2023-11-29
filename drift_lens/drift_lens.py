@@ -265,6 +265,8 @@ class DriftLens:
             E_w_l_idxs = np.nonzero(Y_w == label)
             E_w_l = E_w[E_w_l_idxs]
 
+            print(f"label {label}, Number of samples {len(E_w_l_idxs)}")
+
             # Reduce the embedding dimensionality with PCA_l for current window w
             E_w_l_reduced = baseline.get_PCA_model_by_label(label).transform(E_w_l)
 
@@ -278,6 +280,7 @@ class DriftLens:
                                                            covariance_w_l)
 
             window_distribution_distances_dict["per-label"][str(label)] = distribution_distance_l
+
         return window_distribution_distances_dict
 
 

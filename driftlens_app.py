@@ -97,10 +97,10 @@ def run_drift_detection_background_new_experiment_thread(form_parameters):
     dl.load_baseline(folderpath="static/new_use_cases/tmp/",
                      baseline_name="baseline")
 
-    selected_batch_threshold = 2
+    selected_batch_threshold = float(form_parameters["hidden_batch_threshold"])
     training_labels_id_list = [0,1,2]
     n_samples = len(Y_original_new_unseen)
-    window_size = 1000
+    window_size = int(form_parameters["hidden_window_size"])
     n_windows = n_samples//window_size
     E_windows = []
     Y_predicted_windows = []
@@ -287,7 +287,7 @@ def drift_lens_monitor():
             #thread = socketio.start_background_task(background_thread)
             thread = socketio.start_background_task(run_drift_detection_background_thread, all_parameters, config_dict)
 
-    return render_template('drift_lens_monitor.html', title=title, num_labels=3, label_names=",".join(training_labels_names_list))
+    return render_template('drift_lens_monitor.html', title=title, num_labels=len(training_labels_names_list), label_names=",".join(training_labels_names_list))
 
 
 @app.route("/drift_lens_monitor_new_experiment", methods=["GET", "POST"])
@@ -297,7 +297,6 @@ def drift_lens_monitor_new_experiment():
     if request.method == "POST":
         all_parameters = request.form.to_dict()
         print(all_parameters)
-        print("window size", all_parameters["window_size"])
     global thread
     print('Client connected')
 

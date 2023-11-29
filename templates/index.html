@@ -4,18 +4,22 @@
 {% block content %}
     <img src="static/images/Drift_Lens_Logo.png" alt="logo" width="300" class="d-inline-block align-text-top">
     <p>
-        Welcome....
-
+        <h1>Welcome to the Drift Lens tool 👋 </h1>
+        <b>Drift Lens</b> is an <b>unsupervised drift detection</b> technique for deep learning models on unstructured data.
+        It is based on distribution distances of the embedding representations of deep learning models.
+        The tool is able to perform <b>real-time</b> drift detection and characterization by indicating i) <i>when</i>, ii) <i>how</i> (i.e., the severity and the pattern), and iii) <i>where</i> (i.e., which labels have been affected) drift occurs.
     </p>
 
 
-
+    You can experiment with drift detection on
     <p>
         <ul>
-            <li><b>Drift Detection with a pre-uploaded use case:</b> The DriftLens tool provides four pre-uploaded use cases in the NLP and computer vision domain. </li>
-            <li><b>Upload your use case:</b> </li>
+            <li><b>Pre-uploaded use cases:</b> Where drift can be controlled with several patterns and intensities on pre-uploaded models and data. </li>
+            <li><b>Your own data:</b> Where you can upload your data to verify if drift is present in new data streams.</li>
         </ul>
     </p>
+    If you want to know more about concept drift, Drift Lens methodology, or this tool, you can read the <a href="/documentation">documentation</a>.
+
 
 
 {% endblock %}

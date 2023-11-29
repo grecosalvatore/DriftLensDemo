@@ -432,7 +432,8 @@ def estimate_threshold():
         with open(os.path.join(th_path, f'th_label_{l}.npy'), 'wb') as f:
             np.save(f, per_label_distances[l])
 
-    return jsonify(message="Threshold Estimated")
+    data_list = per_batch_distances_sorted.tolist()
+    return jsonify(data_list)
 
 @app.route('/upload_chunk', methods=['POST'])
 def upload_chunk():

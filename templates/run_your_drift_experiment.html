@@ -25,6 +25,19 @@
     <br>
     Window Size: <input type="range" id="window_size" name="window_size" min="100" max="2000" step="25" value="100" disabled>
     <output id="window_size_output" for="window_size">100</output>
+    <br>
+    <div id="threshold_configuration_container" style="display: none;">
+        <label for="threshold_sensitivity">Threshold Sensitivity:</label>
+        <input type="range" id="threshold_sensitivity" name="threshold_sensitivity" min="0" max="5" step="0.1" value="1">
+        <output for="threshold_sensitivity">1</output>
+        <br>
+        <label for="batch_threshold">Computed Batch Threshold Value:</label>
+        <output id="batch_threshold">0</output> <!-- Initial value can be set based on default threshold sensitivity -->
+        <input type="hidden" id="hidden_batch_threshold" name="hidden_batch_threshold" value="0">
+    </div>
+    <div class="threshold-chart-container">
+        <canvas id="thresholdChartPerBatch" width="100" height="100"></canvas>
+    </div>
     <br><br>
     <h3>Run Drift Experiment</h3>
     Data Stream: <input type="file" class="upload-btn" id="datastream-upload" accept=".hdf5" disabled onchange="handleFileSelect(event, 'datastream')">
@@ -34,6 +47,36 @@
 
 <script type="text/javascript">
     let uploadsInProgress = { baseline: false, threshold: false, datastream: false };
+    var chartInstanceBatch;
+
+
+    document.getElementById('threshold_sensitivity').addEventListener("input", function() {
+        var outputElement = this.nextElementSibling;
+        outputElement.textContent = this.value;
+    });
+
+    document.getElementById('threshold_sensitivity').addEventListener("change", function() {
+        console.log("Change event triggered");
+        var outputElement = this.nextElementSibling;
+        outputElement.textContent = this.value;
+        var sensitivityValue = parseFloat(this.value);
+        var qValue = sensitivityValue;
+
+        if (chartInstanceBatch) {
+            const q = quantile(thresholdBatchData, qValue);
+            const filteredData = thresholdBatchData.filter(x => x < q);
+            var maxValue = Math.max(...filteredData);
+            chartInstanceBatch.options.plugins.annotation.annotations.line1.yMin = maxValue;
+            chartInstanceBatch.options.plugins.annotation.annotations.line1.yMax = maxValue;
+            chartInstanceBatch.update();
+        }
+
+        var batchThresholdValue = maxValue;
+        document.getElementById('batch_threshold').textContent = roundToTwo(batchThresholdValue);
+        document.getElementById("hidden_batch_threshold").value = roundToTwo(batchThresholdValue);
+
+        // Similar logic for chartInstanceLabel if needed
+    });
 
     document.getElementById('window_size').addEventListener('input', function() {
         document.getElementById('window_size_output').textContent = this.value;
@@ -106,12 +149,100 @@
         }
     }
 
+    function createChart(contextId, chartData, label, borderColor) {
+        var ctx = document.getElementById(contextId).getContext('2d');
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.map((_, index) => index),
+                datasets: [{
+                    label: label,
+                    data: chartData,
+                    borderColor: borderColor,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: { y:
+                        { beginAtZero: true,
+                          title: {
+                            display: true,
+                            text: 'Distribution Distances'
+                          }
+                        },
+                    x:
+                        { title: {
+                            display: true,
+                            text: 'Windows'
+                          }
+                        }
+                },
+                plugins: {
+                    annotation: {
+                        annotations: {
+                            line1: {
+                                type: 'line',
+                                yMin: Math.max(...chartData.filter(x => x < quantile(chartData, 1))),
+                                yMax: Math.max(...chartData.filter(x => x < quantile(chartData, 1))),
+                                borderColor: 'rgb(255, 99, 132)',
+                                borderWidth: 2,
+                                label: { content: 'Max Threshold', enabled: true, position: 'start' }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateChartData(chart, newData) {
+        chart.data.datasets[0].data = newData;
+        chart.options.plugins.annotation.annotations.line1.yMin = Math.max(...newData.filter(x => x < quantile(newData, 1)));
+        chart.options.plugins.annotation.annotations.line1.yMax = Math.max(...newData.filter(x => x < quantile(newData, 1)));
+        chart.update();
+    }
+
+    function quantile(arr, q) {
+        // Calculate the index to exclude the top q percent
+        const index = Math.ceil(arr.length * (q / 100)) - 1;
+
+        // Check if the index is within the bounds of the array
+        if (index >= 0 && index < arr.length) {
+            return arr[index];
+        } else {
+            // If q is 0 (or close to 0), return the maximum value (first element)
+            // If q is 1 (or close to 1), return the minimum value (last element)
+            return q <= 0 ? arr[0] : arr[arr.length - 1];
+        }
+    }
+
+
+    function roundToTwo(num) {
+        return +(Math.round(num + "e+2")  + "e-2");
+    }
+
+    function update_default_batch_threshold(qValue){
+        const q = quantile(thresholdBatchData, qValue);
+        const filteredData = thresholdBatchData.filter(x => x < q);
+        var maxValue = Math.max(...filteredData);
+        console.log("max value" + maxValue)
+        document.getElementById('batch_threshold').textContent = roundToTwo(maxValue);
+        document.getElementById("hidden_batch_threshold").value = roundToTwo(maxValue);
+
+    };
+
     async function estimateThreshold() {
+        var thresholdSensitivity = threshold_sensitivity.value;
+        var qValue = parseFloat(thresholdSensitivity);
+
         // Prepare data to be sent, such as dataset and model names
         let data = {
             datasetName: document.getElementById('dataset-name').value,
             modelName: document.getElementById('model-name').value
         };
+
+        // Disable the window size range input
+        document.getElementById('window_size').disabled = true;
 
         // Send the request to your server
         try {
@@ -127,6 +258,18 @@
                 let result = await response.json();
                 console.log('Estimate Threshold Result:', result);
                 // Handle the response data here
+                thresholdBatchData = result;
+                if (!chartInstanceBatch) {
+                    chartInstanceBatch = createChart('thresholdChartPerBatch', result, 'Per-batch distances', 'rgb(75, 192, 192)');
+                } else {
+                    updateChartData(chartInstanceBatch, result);
+                    updateChartData(chartInstanceLabel, result);
+                }
+                console.log("Updating batch th with :", qValue);
+                update_default_batch_threshold(qValue)
+
+                // Enable the threshold configuration container
+                document.getElementById('threshold_configuration_container').style.display = 'block';
             } else {
                 console.error('Server returned error:', response.statusText);
             }

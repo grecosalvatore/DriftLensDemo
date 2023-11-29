@@ -18,7 +18,6 @@
     <link href="{{url_for('static', filename = 'css/app.css')}}" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar content - mobile friendly -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <!-- Link to the home page -->
@@ -34,16 +33,24 @@
                     aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <!-- 3 links to the other pages -->
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/run_our_drift_experiment' %} active {% endif %}" href="/run_our_drift_experiment">&nbsp;Run Controlled Drift Experiment </a>
+                        <a class="nav-link {% if request.path == '/run_our_drift_experiment' %} active {% endif %}" href="/run_our_drift_experiment">Run Controlled Drift Experiment</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/run_your_drift_experiment' %} active {% endif %}" href="/run_your_drift_experiment"> Run Your Drift Experiment </a>
+                        <a class="nav-link {% if request.path == '/run_your_drift_experiment' %} active {% endif %}" href="/run_your_drift_experiment">Run Your Drift Experiment</a>
                     </li>
                 </ul>
+                <div class="ms-auto">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/documentation' %} active {% endif %}" href="/documentation">Docs</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>

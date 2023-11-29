@@ -326,6 +326,10 @@ Serve root index file
 def index():
     return render_template('index.html')
 
+@app.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
+
 @app.route('/run_your_drift_experiment')
 def run_your_drift_experiment():
     timestamp = int(time.time())

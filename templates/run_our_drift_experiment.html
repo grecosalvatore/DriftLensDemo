@@ -623,7 +623,20 @@
                 }]
             },
             options: {
-                scales: { y: { beginAtZero: true } },
+                scales: { y:
+                        { beginAtZero: true,
+                          title: {
+                            display: true,
+                            text: 'Distribution Distances'
+                          }
+                        },
+                    x:
+                        { title: {
+                            display: true,
+                            text: 'Windows'
+                          }
+                        }
+                },
                 plugins: {
                     annotation: {
                         annotations: {

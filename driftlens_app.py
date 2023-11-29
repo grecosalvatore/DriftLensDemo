@@ -296,6 +296,8 @@ def drift_lens_monitor_new_experiment():
 
     if request.method == "POST":
         all_parameters = request.form.to_dict()
+        print(all_parameters)
+        print("window size", all_parameters["window_size"])
     global thread
     print('Client connected')
 
@@ -330,13 +332,14 @@ def index():
 def documentation():
     return render_template('documentation.html')
 
-@app.route('/run_your_drift_experiment')
+@app.route('/run_your_drift_experiment',  methods=["GET", "POST"])
 def run_your_drift_experiment():
     timestamp = int(time.time())
     session_dir = os.path.join('static', 'new_use_cases', 'tmp', str(timestamp))
     data_dir = os.path.join(session_dir, 'data')
     os.makedirs(data_dir, exist_ok=True)
     return render_template('run_your_drift_experiment.html', data_dir=data_dir)
+
 
 @app.route('/get_threshold_values', methods=["GET", "POST"])
 def get_threshold_values():

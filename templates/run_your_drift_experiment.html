@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Run Drift Experiment on Your Data</h1>
-<!--<form enctype="multipart/form-data" action="/drift_lens_monitor" method="POST" onsubmit="handleSubmit(event)">-->
+    <!--<form enctype="multipart/form-data" action="/drift_lens_monitor_new_experiment" method="POST" onsubmit="handleSubmit(event)">-->
     <form enctype="multipart/form-data" action="/drift_lens_monitor_new_experiment" method="POST">
     <br>
     <h3>Use Case Selection</h3>
@@ -354,10 +354,39 @@
         document.getElementById('submit-btn').disabled = !(allUploadsCompleted && datasetFilled && modelFilled);
     }
 
-    function handleSubmit(event) {
-        event.preventDefault();
-        // Handle form submission logic here
-    }
+/*function handleSubmit(event) {
+    event.preventDefault();
+
+    // Retrieve window size and batch threshold value
+    let windowSize = document.getElementById('window_size').value;
+    let batchThreshold = document.getElementById('hidden_batch_threshold').value;
+
+    // Prepare the FormData object for submission
+    let formData = new FormData(event.target);
+    formData.append('window_size', windowSize);
+    formData.append('hidden_batch_threshold', batchThreshold);
+
+    // Add any additional data you need to send
+
+    // Perform the form submission
+    fetch('/drift_lens_monitor_new_experiment', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Server returned error: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(result => {
+        console.log('Form Submission Result:', result);
+        // Handle the response data here
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}*/
 
 
 </script>

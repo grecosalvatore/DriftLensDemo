@@ -309,7 +309,8 @@ def drift_lens_monitor_new_experiment():
     #        config_dict = yaml.safe_load(f)
 
     #training_labels_names_list = config_dict["training_labels_name_list"]
-    training_labels_names_list = ["world", "business", "sport", "sport2", "sport3"]
+    training_labels_names_list = ["Technology", "Sale-Ads", "sport", "Politics", "Science"]
+
 
     global thread
     with thread_lock:

@@ -93,12 +93,15 @@ def run_drift_detection_background_new_experiment_thread(form_parameters):
     new_unseen_embedding_path = f"static/new_use_cases/tmp/datastream.hdf5"
     E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
     print(E_new_unseen.shape)
-    dl = DriftLens([0, 1, 2])
-    dl.load_baseline(folderpath="static/new_use_cases/tmp/",
+    dl = DriftLens()
+    baseline = dl.load_baseline(folderpath="static/new_use_cases/tmp/",
                      baseline_name="baseline")
 
+    print(Y_predicted_new_unseen)
+
     selected_batch_threshold = float(form_parameters["hidden_batch_threshold"])
-    training_labels_id_list = [0,1,2]
+    training_labels_id_list = baseline.label_list
+    #training_labels_id_list = [0,1,2]
     n_samples = len(Y_original_new_unseen)
     window_size = int(form_parameters["hidden_window_size"])
     n_windows = n_samples//window_size
@@ -110,7 +113,7 @@ def run_drift_detection_background_new_experiment_thread(form_parameters):
         start_index = i*window_size
         end_index = i * window_size + window_size
         E_windows.append(E_new_unseen[start_index:end_index])
-        Y_predicted_windows.append(Y_original_new_unseen[start_index:end_index])
+        Y_predicted_windows.append(Y_predicted_new_unseen[start_index:end_index])
 
     for i, (E_w, y_pred) in enumerate(zip(E_windows, Y_predicted_windows)):
         window_distance = dl.compute_window_distribution_distances(E_w, y_pred)
@@ -306,7 +309,7 @@ def drift_lens_monitor_new_experiment():
     #        config_dict = yaml.safe_load(f)
 
     #training_labels_names_list = config_dict["training_labels_name_list"]
-    training_labels_names_list = ["world", "business", "sport"]
+    training_labels_names_list = ["world", "business", "sport", "sport2", "sport3"]
 
     global thread
     with thread_lock:
@@ -314,7 +317,7 @@ def drift_lens_monitor_new_experiment():
             #thread = socketio.start_background_task(background_thread)
             thread = socketio.start_background_task(run_drift_detection_background_new_experiment_thread, all_parameters)
 
-    return render_template('drift_lens_monitor.html', title=title, num_labels=3, label_names=",".join(training_labels_names_list))
+    return render_template('drift_lens_monitor.html', title=title, num_labels=5, label_names=",".join(training_labels_names_list))
 
 
 
@@ -378,14 +381,14 @@ def estimate_threshold():
     threshold_embedding_path = f"static/new_use_cases/tmp/threshold.hdf5"
     batch_n_pc = 150
     per_label_n_pc = 75
-    training_label_list = [0, 1, 2]
+    training_label_list = [0, 1, 2, 3, 4]
     E_th, Y_original_th, Y_predicted_th = load_embedding(threshold_embedding_path)
     base_path = f"static/new_use_cases/tmp"
     dl = DriftLens(training_label_list)
     dl.load_baseline(base_path, "baseline")
 
     wg = WindowsGenerator(training_label_list,
-                          [-1],
+                          [5],
                           E_th,
                           Y_predicted_th,
                           Y_original_th,
@@ -396,9 +399,9 @@ def estimate_threshold():
     per_batch_distances = []
     per_label_distances = {label: [] for label in training_label_list}
 
-    for i in range(100):
+    for i in range(1000):
         E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_without_drift_windows_generation(
-            window_size=2000,
+            window_size=500,
             n_windows=1,
             flag_shuffle=True,
             flag_replacement=True,

@@ -11,11 +11,11 @@
 It performs distribution distances between a historical dataset, called baseline, and a new data stream divided in fixed-sized windows.
 
 # Table of Contents
-
 - [Methodology and Models](#methodology-and-models)
 - [DriftLens Demo](#demo)
   - [Screenshots](#screenshots)
 - [Setup](#setup)
+- [Recorded Demo](#recorded-demo)
 - [References](#references)
 - [People Involved](#people-behind-driftlens)
 
@@ -168,6 +168,9 @@ pip install -r requirements.txt
 python driftlens_app.py
 ```
 The DriftLens app will run on localhost: http://127.0.0.1:5000
+
+# Recorded Demo
+[![Watch the video](https://img.youtube.com/vi/1R2igFhMD8U&t=7s/hqdefault.jpg)](https://www.youtube.com/watch?v=1R2igFhMD8U&t=7s)
 
 
 

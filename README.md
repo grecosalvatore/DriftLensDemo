@@ -170,7 +170,7 @@ python driftlens_app.py
 The DriftLens app will run on localhost: http://127.0.0.1:5000
 
 # Recorded Demo
-[![Watch the video](https://img.youtube.com/vi/1R2igFhMD8U&t=7s/hqdefault.jpg)](https://www.youtube.com/watch?v=1R2igFhMD8U&t=7s)
+[![Watch the video](https://img.youtube.com/vi/1R2igFhMD8U/hqdefault.jpg)](https://www.youtube.com/watch?v=1R2igFhMD8U)
 
 
 

@@ -418,9 +418,11 @@ def estimate_threshold():
     per_batch_distances_arr = np.array(per_batch_distances)
     indices = (-per_batch_distances_arr).argsort()
     per_batch_distances_sorted = per_batch_distances_arr[indices]
+    per_batch_distances_sorted = per_batch_distances_sorted + 1.2
 
     for l in training_label_list:
         per_label_distances[l] = sorted(per_label_distances[l], reverse=True)
+        #per_label_distances[l] = per_label_distances[l] + 1.2
 
     th_path = os.path.join(base_path, "thresholds")
 

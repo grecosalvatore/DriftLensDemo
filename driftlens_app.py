@@ -400,7 +400,7 @@ def estimate_threshold():
     per_batch_distances = []
     per_label_distances = {label: [] for label in training_label_list}
 
-    for i in range(1000):
+    for i in range(100):
         E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_without_drift_windows_generation(
             window_size=500,
             n_windows=1,

@@ -146,6 +146,8 @@ The *offline* phase takes as input an historical dataset, called baseline, that 
 &#x2460;. Then, the majority of the baseline dataset is used to model the distributions of the baseline &#x2461;. Instead, a small portion of the baseline data is used to estimate the threshold values &#x2462;
 ## Online Phase
 
+# DriftLens Demo
+
 # Setup
 To use the tool locally:
 1) Create and Start a new environment:
@@ -166,6 +168,8 @@ pip install -r requirements.txt
 python driftlens_app.py
 ```
 The DriftLens app will run on localhost: http://127.0.0.1:5000
+
+
 
 # References
 ```bibtex

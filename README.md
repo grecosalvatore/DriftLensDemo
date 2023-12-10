@@ -188,7 +188,7 @@ The DriftLens app will run on localhost: http://127.0.0.1:5000
   }
 ```
 
-# People Involved
+# Authors
 
 - **Salvatore Greco** - [Homepage](https://grecosalvatore.github.io/) - [GitHub](https://github.com/grecosalvatore) - [Twitter](https://twitter.com/_salvatoregreco)
 - **Bartolomeo Vacchetti** - [Homepage]()

@@ -15,9 +15,9 @@ import json
 import os
 import yaml
 import shutil
-"""
-Background Thread
-"""
+
+
+""" Background Thread """
 thread = None
 thread_lock = Lock()
 
@@ -34,6 +34,7 @@ def get_current_datetime():
     return now.strftime("%H:%M:%S")
 
 def get_datasets_models_and_window_sizes():
+    """ Get all datasets, models and window sizes available in the static folder. """
     base_directory = "static/use_cases/datasets"
     datasets = []
 
@@ -64,11 +65,13 @@ def get_datasets_models_and_window_sizes():
 
 @app.route("/run_our_drift_experiment")
 def run_our_drift_experiment():
+    """ Run controlled drift experiment on pre-uploaded use cases. """
     title = 'DriftLens'
     available_data = get_datasets_models_and_window_sizes()
     return render_template('run_our_drift_experiment.html', title=title, data=available_data)
 
 def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name=None):
+    """ Load embedding from HDF5 file. """
     if filepath is not None:
         with h5py.File(filepath, "r") as hf:
             if E_name is None:
@@ -89,6 +92,7 @@ def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name
 
 
 def run_drift_detection_background_new_experiment_thread(form_parameters):
+    """ Run drift detection in background thread. """
     print("done")
     new_unseen_embedding_path = f"static/new_use_cases/tmp/datastream.hdf5"
     E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
@@ -270,6 +274,7 @@ def run_drift_detection_background_thread(form_parameters, config_dict):
 
 @app.route("/drift_lens_monitor", methods=["GET", "POST"])
 def drift_lens_monitor():
+    """ Route to the drift lens monitor page. """
     title = 'DriftLens'
 
     if request.method == "POST":
@@ -295,6 +300,7 @@ def drift_lens_monitor():
 
 @app.route("/drift_lens_monitor_new_experiment", methods=["GET", "POST"])
 def drift_lens_monitor_new_experiment():
+    """ Route to the drift lens monitor page for users uploaded data. """
     title = 'DriftLens'
 
     if request.method == "POST":
@@ -329,10 +335,12 @@ Serve root index file
 """
 @app.route('/')
 def index():
+    """ Route to the index page. """
     return render_template('index.html')
 
 @app.route('/documentation')
 def documentation():
+    """ Route to the documentation page."""
     return render_template('documentation.html')
 
 @app.route('/run_your_drift_experiment',  methods=["GET", "POST"])
@@ -346,6 +354,7 @@ def run_your_drift_experiment():
 
 @app.route('/get_threshold_values', methods=["GET", "POST"])
 def get_threshold_values():
+    """ Route to get the threshold values for the drift lens monitor. """
     dataset = request.args.get('dataset')
     model = request.args.get('model')
     window_size = request.args.get('window_size', type=int)
@@ -363,6 +372,7 @@ def get_threshold_values():
 
 @app.route('/compute_baseline', methods=['POST'])
 def compute_baseline():
+    """ Route to compute the baseline. """
     print("--- Computing Baseline")
     baseline_embedding_path = f"static/new_use_cases/tmp/baseline.hdf5"
     batch_n_pc = 150
@@ -378,6 +388,7 @@ def compute_baseline():
 
 @app.route('/estimate_threshold', methods=['POST'])
 def estimate_threshold():
+    """ Route to estimate the threshold. """
     print("--- Estimating Threshold")
     threshold_embedding_path = f"static/new_use_cases/tmp/threshold.hdf5"
     batch_n_pc = 150
@@ -445,6 +456,7 @@ def estimate_threshold():
 
 @app.route('/upload_chunk', methods=['POST'])
 def upload_chunk():
+    """ Route to upload a chunk of a file. """
     chunk = request.files['fileChunk']
     upload_type = request.form['uploadType']
     dataset = request.form['datasetName']
@@ -475,6 +487,7 @@ def upload_chunk():
 
 
 def combine_chunks(data_dir, output_filename):
+    """ Combine all chunks into a single file. """
     # Get a list of all chunk files
     chunk_files = [f for f in os.listdir(data_dir) if f.startswith('baseline_chunk_')]
     chunk_files.sort()  # Sort to ensure correct order
@@ -495,6 +508,7 @@ def combine_chunks(data_dir, output_filename):
 
 @socketio.on('disconnect')
 def disconnect():
+    """ Disconnect the client. """
     print('Client disconnected',  request.sid)
 
 if __name__ == '__main__':

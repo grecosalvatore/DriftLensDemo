@@ -192,7 +192,7 @@ The first page allows you to configure a controlled drift experiment using Drift
     </tr>
   <tr>
       <th>3.1</th>
-      <td rowspan=2">STL</td>
+      <td rowspan=2">Intel-Image</td>
       <td rowspan="2">Computer Vision</td>
       <td>VGG16</td>
       <td>0.89</td>

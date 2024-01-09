@@ -12,8 +12,9 @@ import pandas as pd
 from scipy import stats
 
 class DriftLens:
-
+    """ DriftLens class. """
     def __init__(self, label_list=None):
+        """ DriftLens class constructor. """
 
         self.baseline = None
         self.threshold = None

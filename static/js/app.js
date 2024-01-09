@@ -135,7 +135,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function addData(label, batch_distance, per_label_distances, batch_drift_prediction) {
 
-
     // Update main dataset
     myChart.data.datasets[0].data.push(batch_distance);
 

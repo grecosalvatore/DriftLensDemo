@@ -11,6 +11,7 @@ import json
 class BaselineClass:
     """ Baseline CLass: it contains all the attributes and methods of the baseline. """
     def __init__(self):
+        """ Constructor of the BaselineClass. """
 
         self.label_list = None  # List of labels used to train the model
         self.batch_n_pc = None  # Number of principal components to reduce the embedding for the entire batch drift

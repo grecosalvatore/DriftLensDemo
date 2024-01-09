@@ -10,6 +10,7 @@ from tqdm import tqdm
 class ThresholdClass:
     """ Threshold Class: it contains all the attributes and methods of the threshold. """
     def __init__(self):
+        """ Initializes the threshold class. """
         self.label_list = None  # List of labels used to train the model
         self.batch_n_pc = None
         self.per_label_n_pc = None

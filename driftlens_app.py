@@ -70,7 +70,7 @@ def run_our_drift_experiment():
     available_data = get_datasets_models_and_window_sizes()
     return render_template('run_our_drift_experiment.html', title=title, data=available_data)
 
-def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name=None):
+def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name=None, load_original_labels=True):
     """ Load embedding from HDF5 file. """
     if filepath is not None:
         with h5py.File(filepath, "r") as hf:
@@ -78,6 +78,13 @@ def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name
                 E = hf["E"][()]
             else:
                 E = hf[E_name][()]
+            if load_original_labels:
+                if Y_original_name is None:
+                    Y_original = hf["Y_original"][()]
+                else:
+                    Y_original = hf[Y_original_name][()]
+            else:
+                Y_original = None
             if Y_original_name is None:
                 Y_original = hf["Y_original"][()]
             else:
@@ -95,7 +102,7 @@ def run_drift_detection_background_new_experiment_thread(form_parameters):
     """ Run drift detection in background thread. """
     print("done")
     new_unseen_embedding_path = f"static/new_use_cases/tmp/datastream.hdf5"
-    E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path)
+    E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path, load_original_labels=False)
     print(E_new_unseen.shape)
     dl = DriftLens()
     baseline = dl.load_baseline(folderpath="static/new_use_cases/tmp/",
@@ -377,7 +384,7 @@ def compute_baseline():
     baseline_embedding_path = f"static/new_use_cases/tmp/baseline.hdf5"
     batch_n_pc = 150
     per_label_n_pc = 75
-    E_baseline, Y_original_baseline, Y_predicted_baseline = load_embedding(baseline_embedding_path)
+    E_baseline, Y_original_baseline, Y_predicted_baseline = load_embedding(baseline_embedding_path, load_original_labels=True)
     label_list = sorted(list(set(Y_predicted_baseline)))
     label_list = [int(l) for l in label_list]
     baseline_estimator = _baseline.StandardBaselineEstimator(label_list, batch_n_pc, per_label_n_pc)
@@ -394,7 +401,7 @@ def estimate_threshold():
     batch_n_pc = 150
     per_label_n_pc = 75
     training_label_list = [0, 1, 2, 3, 4]
-    E_th, Y_original_th, Y_predicted_th = load_embedding(threshold_embedding_path)
+    E_th, Y_original_th, Y_predicted_th = load_embedding(threshold_embedding_path, load_original_labels=True)
     base_path = f"static/new_use_cases/tmp"
     dl = DriftLens(training_label_list)
     dl.load_baseline(base_path, "baseline")

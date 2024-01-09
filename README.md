@@ -106,16 +106,16 @@ the threshold values), it is indicated in the plot (see §3.2).
 # DriftLens Tool
 The tool is a web application implemented in Flask based on the DriftLens methodology. 
 
-Within the tool, users can perform two types of experiments: 
+Within the tool, you can perform two types of experiments: 
 1. Run controlled drift experiments on pre-uploaded use cases (Page 1). 
-2. Run drift detection on user-provided data (Page 2).
+2. Run drift detection on your own data (Page 2).
 
 Both pages run the *online* phase of DriftLens to perform drift detection to understand **if**, **where**, and **how** drift occurs on the controlled or user-provided data streams
 by opening the DriftLens drift detection monitor (Page 3).
 
 ## 1) Run controlled drift experiments on pre-uploaded use cases (Page 1)
 
-The first page allows users to configure a controlled drift experiment using DriftLens on a set of pre-uploaded use cases.
+The first page allows you to configure a controlled drift experiment using DriftLens on a set of pre-uploaded use cases.
 
 ![Screenshot](static/images/Screenshot_page1.png)
 
@@ -240,10 +240,10 @@ The first page allows users to configure a controlled drift experiment using Dri
 </table>
 
 ### Data stream generation
-For each use case, the user can generate a data stream by setting two parameters: the *number of windows*
+For each use case, you can generate a data stream by setting two parameters: the *number of windows*
 and the *window size*. A data stream consisting of number of windows will be created, each composed of window size samples.
 
-In the generation of the data stream, the user can simulate four types of drift scenarios:
+In the generation of the data stream, you can simulate four types of drift scenarios:
 
 ![Screenshot](static/images/drift-lens-demo-drift-patterns.png)
 
@@ -251,13 +251,13 @@ In the generation of the data stream, the user can simulate four types of drift 
 
 ## 2) Run drift detection on user-provided data (Page 2)
 
-The second page allows users to experiment with drift detection on
-their data and models.
+The second page allows you to experiment with drift detection on
+your data and models.
 
-To this end, users should provide the embedding and predicted labels for the *baseline* and *threshold*
+To this end, you should provide the embedding and predicted labels for the *baseline* and *threshold*
 datasets (e.g., training and test set) to
 execute the offline phase of DriftLens.
-Then, users should provide an order *data stream* to perform the drift detection.
+Finally, you should provide an order *data stream* to perform the drift detection.
 
 ![Screenshot](static/images/Screenshot_page2.png)
 
@@ -272,7 +272,7 @@ stream.
 
 
 
-The drift detection monitor can be used to understand: 
+You can use the drift detection monitor to understand: 
 - *when* drift occurs by looking at the windows in which drift was predicted;
 - *how* drift occurs in terms of severity of the drift and patterns;
 - *where* drift occurs by analyzing the labels the most affected by drift.

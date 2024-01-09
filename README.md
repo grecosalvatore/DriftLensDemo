@@ -296,6 +296,10 @@ pip install -r requirements.txt
 ```sh
 ./download_data.sh 
 ```
+
+You can also download the zip file manually and replace the 'use_cases' folder in the 'static' folder with the one in the zip file. The zip file can be downloaded from here: 
+
+https://www.dropbox.com/scl/fi/3uezd5qmecfune6d7fruu/use_cases.zip?rlkey=9ei0elx78mkssnkniaf5gnq70&dl=0
 ### 4) Start the DriftLens app locally:
 ```sh
 python driftlens_app.py

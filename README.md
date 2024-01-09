@@ -259,6 +259,8 @@ datasets (e.g., training and test set) to
 execute the offline phase of DriftLens.
 Finally, you should provide an order *data stream* to perform the drift detection.
 
+You can read the correct format for your data [here](use-your-own-data-to-perform-drift-detection).
+
 ![Screenshot](static/images/Screenshot_page2.png)
 
 ## 3) Drift detection monitor (Page 3)

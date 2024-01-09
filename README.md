@@ -56,11 +56,13 @@ represented by the embeddings’ mean vector and covariance matrix.
 ### Distribution Distances
 The Frechét Inception Distance (FID) score
 is used to compute the distance between two multivariate normal
-distributions. It is a real [0, ∞] range value. The higher the score,
-the greater the distance and the more likely the drift.
+distributions. 
 
 The  Frechét Inception Distance between two multivariate normal distributions is computed as:
 ![Screenshot](static/images/fid-formula.png)
+
+It is a real [0, ∞] range value. The higher the score,
+the greater the distance and the more likely the drift.
 
 ## Offline Phase
 In the *offline* DriftLens estimates the distributions of a historical dataset, called *baseline*, which represents the concepts
@@ -109,7 +111,7 @@ Within the tool, you can perform two types of experiments:
 1. Run controlled drift experiments on pre-uploaded use cases (Page 1). 
 2. Run drift detection on your own data (Page 2).
 
-Both pages run the *online* phase of DriftLens to perform drift detection to understand **if**, **where**, and **how** drift occurs on the controlled or user-provided data streams
+Both pages run the *online* phase of DriftLens to perform drift detection to understand **if**, **where**, and **how** drift occurs on the controlled or your data streams
 by opening the DriftLens drift detection monitor (Page 3).
 
 ## 1) Run controlled drift experiments on pre-uploaded use cases (Page 1)

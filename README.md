@@ -79,7 +79,7 @@ distributions independently of the class label. The mean and covariance are comp
 number of labels the model was trained on. Each one is modeled by
 grouping the embeddings by predicted labels and computing the mean and covariance of each label separately.
 
-To compute the thresholds, a large number of windows are sampled from the threshold dataset.
+To estimate the thresholds &#x2463;, a large number of windows are sampled from the threshold dataset.
 The distances  are then calculated between the baseline and each window, and sorted in descending
 order. The maximum value represents the
 maximum distance of a set of samples considered without drift. This value is set as the threshold.
@@ -89,19 +89,18 @@ In the online phase, DriftLens analyzes the new data stream in
 fixed-size windows. For each window, the process is similar to the
 offline phase. 
 
-Firstly, the embedding vectors and the predicted labels
-are produced by the model (Figure 1- 5○). Secondly, the per-batch
-and per-label distributions are modeled by computing the mean and
+* The embedding vectors and the predicted labels
+are produced by the model &#x2464;.
+* The *per-batch* and *per-label* distributions are modeled by computing the mean and
 covariance of the embedding for the entire window and the samples
-predicted for each label separately (Figure 6○). Then, the per-batch
-and per-label distribution distances between the embeddings of
-the current window and the baseline are computed (Figure 1- 7○).
-Finally, if the distribution distances exceed the threshold values,
-drift is predicted for the current window (Figure 1- 8○).
-The process is repeated for each window. A drift monitor plots
+predicted for each label separately &#x2465;. 
+* The *per-batch* and *per-label* distribution distances between the embeddings of
+the current window and the baseline are computed &#x2466;.
+* Drift is predicted if the distribution distances exceed the threshold values for the current window &#x2467;.
+
+The process is repeated for each window. A [drift monitor](#3-drift-detection-monitor-page-3) plots
 the distribution distances per-batch and per-labels separately over
-time. When drift is predicted (i.e., the distribution distances exceed
-the threshold values), it is indicated in the plot (see §3.2).
+time. 
 
 # DriftLens Tool
 The tool is a web application implemented in Flask based on the DriftLens methodology. 
@@ -259,7 +258,7 @@ datasets (e.g., training and test set) to
 execute the offline phase of DriftLens.
 Finally, you should provide an order *data stream* to perform the drift detection.
 
-You can read the correct format for your data [here](use-your-own-data-to-perform-drift-detection).
+You can read the correct format for your data [here](#use-your-own-data-to-perform-drift-detection).
 
 ![Screenshot](static/images/Screenshot_page2.png)
 
@@ -330,5 +329,5 @@ If you want to perform a drift detection on your own data, you need to provide t
 
 - **Salvatore Greco** - [Homepage](https://grecosalvatore.github.io/) - [GitHub](https://github.com/grecosalvatore) - [Twitter](https://twitter.com/_salvatoregreco)
 - **Bartolomeo Vacchetti** - [Homepage]()
-- **Daniele Apiletti** - [Homepage]()
-- **Tania Cerquitelli** - [Homepage]()
+- **Daniele Apiletti** - [Homepage](https://www.polito.it/en/staff?p=daniele.apiletti)
+- **Tania Cerquitelli** - [Homepage](https://dbdmg.polito.it/dbdmg_web/people/tania-cerquitelli/)

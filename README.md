@@ -25,16 +25,16 @@ This repo contains the code for the DriftLens tool, a web application which allo
 - [References](#references)
 - [People Involved](#people-behind-driftlens)
 
-#DriftLens Methodology
+# DriftLens Methodology
 ![Screenshot](static/images/driftlens-demo-architecture.png)
 The Drift Detection methodology in DriftLens includes two main phases: an *offline* and an *online* phases.
 
-##Offline Phase
+## Offline Phase
 The *offline* phase takes as input an historical dataset, called baseline, that represents what the model learned during training. Firstly, the baseline data is feed into the model to extract the embedding vectors and the predicted labels 
 &#x2460;. Then, the majority of the baseline dataset is used to model the distributions of the baseline &#x2461;. Instead, a small portion of the baseline data is used to estimate the threshold values &#x2462;
 ## Online Phase
 
-#DriftLens Tool
+# DriftLens Tool
 The tool is a web application implemented in Flask based on the DriftLens methodology. 
 
 Within the tool, users can perform two types of experiments: 

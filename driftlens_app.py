@@ -396,18 +396,22 @@ def compute_baseline():
 @app.route('/estimate_threshold', methods=['POST'])
 def estimate_threshold():
     """ Route to estimate the threshold. """
+
     print("--- Estimating Threshold")
     threshold_embedding_path = f"static/new_use_cases/tmp/threshold.hdf5"
     batch_n_pc = 150
     per_label_n_pc = 75
-    training_label_list = [0, 1, 2, 3, 4]
+    #training_label_list = [0, 1, 2, 3, 4]
     E_th, Y_original_th, Y_predicted_th = load_embedding(threshold_embedding_path, load_original_labels=True)
+
+    training_label_list = range(max(Y_predicted_th))
+
     base_path = f"static/new_use_cases/tmp"
     dl = DriftLens(training_label_list)
     dl.load_baseline(base_path, "baseline")
 
     wg = WindowsGenerator(training_label_list,
-                          [5],
+                          [max(Y_predicted_th)+1],
                           E_th,
                           Y_predicted_th,
                           Y_original_th,

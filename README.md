@@ -8,9 +8,14 @@
 
 
 *DriftLens* is an **unsupervised drift detection** framework for deep learning classifiers on unstructured data.
-It performs distribution distances between a historical dataset, called baseline, and a new data stream divided in fixed-sized windows.
+The *DriftLens* methodology was first proposed in the paper:
+
+[Drift Lens: Real-time unsupervised Concept Drift detection by evaluating per-label embedding distributions](https://ieeexplore.ieee.org/document/9679880).
+
 
 This repo contains the code for the DriftLens tool, a web application which allows users to run controlled drift experiments on pre-uploaded use cases or run drift detection on user-provided data.
+
+The demo paper about the tool is currently under review.
 
 # Table of Contents
 - [DriftLens Methodology](#driftlens-methodology)
@@ -28,7 +33,6 @@ This repo contains the code for the DriftLens tool, a web application which allo
 # DriftLens Methodology
 
 DriftLens is an unsupervised drift detection framework for deep learning classifiers on unstructured data.
-The DriftLens methodology was first proposed in the paper [Drift Lens: Real-time unsupervised Concept Drift detection by evaluating per-label embedding distributions](https://ieeexplore.ieee.org/document/9679880).
 
 
 ![Screenshot](static/images/driftlens-demo-architecture.png)

@@ -23,7 +23,7 @@ This repo contains the code for the DriftLens tool, a web application which allo
 - [Setup](#setup)
 - [Recorded Demo](#recorded-demo)
 - [References](#references)
-- [People Involved](#people-involved)
+- [Authors](#authors)
 
 # DriftLens Methodology
 ![Screenshot](static/images/driftlens-demo-architecture.png)

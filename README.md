@@ -308,6 +308,10 @@ If you want to perform a drift detection on your own data, you need to provide t
 - **threshold_embedding**: the embedding of the threshold dataset (e.g., test set or training set)
 - **data_stream**: the data stream to be used for drift detection
 
+Each file should be in the HDF5 format and contain the following columns:
+- *"E"*: the embedding of the samples in your dataset, as a numpy array of shape (*n_samples*, *embedding_dimension*).
+- *"Y_predicted"*: the predicted labels of the samples in your dataset, as a list of *n_samples* elements.
+
 # Recorded Demo
 [![Watch the video](https://img.youtube.com/vi/1R2igFhMD8U/hqdefault.jpg)](https://www.youtube.com/watch?v=1R2igFhMD8U)
 

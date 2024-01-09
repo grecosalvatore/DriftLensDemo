@@ -17,13 +17,13 @@ This repo contains the code for the DriftLens tool, a web application which allo
   - [Offline Phase](#offline-phase)
   - [Online Phase](#online-phase)
 - [DriftLens Tool](#driftlens-tool)
-  - [Run controlled drift experiments on pre-uploaded use cases](#page1)
-  - [Run drift detection on user-provided data](#page2)
-  - [Drift Detection Monitor](#page3)
+  - [Run controlled drift experiments on pre-uploaded use cases](#1-run-controlled-drift-experiments-on-pre-uploaded-use-cases-page-1)
+  - [Run drift detection on user-provided data](#2-run-drift-detection-on-user-provided-data-page-2)
+  - [Drift Detection Monitor](#3-drift-detection-monitor-page-3)
 - [Setup](#setup)
 - [Recorded Demo](#recorded-demo)
 - [References](#references)
-- [People Involved](#people-behind-driftlens)
+- [People Involved](#people-involved)
 
 # DriftLens Methodology
 ![Screenshot](static/images/driftlens-demo-architecture.png)

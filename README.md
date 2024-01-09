@@ -44,7 +44,7 @@ Within the tool, users can perform two types of experiments:
 Both pages run the *online* phase of DriftLens to perform drift detection to understand **if**, **where**, and **how** drift occurs on the controlled or user-provided data streams
 by opening the DriftLens drift detection monitor (Page 3).
 
-## 1) Run controlled drift experiments on pre-uploaded use cases 
+## 1) Run controlled drift experiments on pre-uploaded use cases (Page 1)
 
 The first page allows users to configure a controlled drift experiment using DriftLens on a set of pre-uploaded use cases.
 
@@ -180,7 +180,7 @@ In the generation of the data stream, the user can simulate four types of drift 
 
 
 
-## 2) Run drift detection on user-provided data.
+## 2) Run drift detection on user-provided data (Page 2)
 
 The second page allows users to experiment with drift detection on
 their data and models.
@@ -192,7 +192,7 @@ Then, users should provide an order *data stream* to perform the drift detection
 
 ![Screenshot](static/images/Screenshot_page2.png)
 
-## 3) Drift detection monitor
+## 3) Drift detection monitor (Page 3)
 The tool processes each data window in real-time using the DriftLens
 methodology. The drift monitor page shows the distribution dis-
 tances for the entire window (per-batch) and separately per label

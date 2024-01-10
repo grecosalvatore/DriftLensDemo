@@ -99,7 +99,7 @@ def load_embedding(filepath, E_name=None, Y_original_name=None, Y_predicted_name
 
 
 def run_drift_detection_background_new_experiment_thread(form_parameters):
-    """ Run drift detection in background thread. """
+    """ Run drift detection on user-provided data in a background thread. """
     print("done")
     new_unseen_embedding_path = f"static/new_use_cases/tmp/datastream.hdf5"
     E_new_unseen, Y_original_new_unseen, Y_predicted_new_unseen = load_embedding(new_unseen_embedding_path, load_original_labels=False)
@@ -151,6 +151,8 @@ def run_drift_detection_background_new_experiment_thread(form_parameters):
         socketio.sleep(selected_latency/1000)
 
 def run_drift_detection_background_thread(form_parameters, config_dict):
+    """ Run drift detection with controlled drift experiment in a background thread. """
+
     selected_dataset = form_parameters['dataset']
     selected_model = form_parameters['model']
     selected_window_size = int(form_parameters['window_size'])

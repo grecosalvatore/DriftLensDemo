@@ -322,6 +322,9 @@ Each file should be in the HDF5 format and contain the following columns:
 
 
 # References
+If you use the DriftLens methodology or tool, please cite the following papers:
+
+**DriftLens Methodology**
 ```bibtex
 @INPROCEEDINGS{driftlens,
   author={Greco, Salvatore and Cerquitelli, Tania},
@@ -334,10 +337,13 @@ Each file should be in the HDF5 format and contain the following columns:
   doi={10.1109/ICDMW53433.2021.00049}
   }
 ```
-
+**DriftLens Tool**
+```bibtex
+UNDER REVIEW
+```
 # Authors
 
-- **Salvatore Greco** - [Homepage](https://grecosalvatore.github.io/) - [GitHub](https://github.com/grecosalvatore) - [Twitter](https://twitter.com/_salvatoregreco)
-- **Bartolomeo Vacchetti** - [Homepage]()
-- **Daniele Apiletti** - [Homepage](https://www.polito.it/en/staff?p=daniele.apiletti)
-- **Tania Cerquitelli** - [Homepage](https://dbdmg.polito.it/dbdmg_web/people/tania-cerquitelli/)
+- **Salvatore Greco**, *Politecnico di Torino* - [Homepage](https://grecosalvatore.github.io/) - [GitHub](https://github.com/grecosalvatore) - [Twitter](https://twitter.com/_salvatoregreco)
+- **Bartolomeo Vacchetti**, *Politecnico di Torino* - [Homepage]()
+- **Daniele Apiletti**, *Politecnico di Torino* - [Homepage](https://www.polito.it/en/staff?p=daniele.apiletti)
+- **Tania Cerquitelli**, *Politecnico di Torino* - [Homepage](https://dbdmg.polito.it/dbdmg_web/people/tania-cerquitelli/)

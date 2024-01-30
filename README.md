@@ -12,9 +12,6 @@ The *DriftLens* methodology was first proposed in the paper:
 
 [Drift Lens: Real-time unsupervised Concept Drift detection by evaluating per-label embedding distributions](https://ieeexplore.ieee.org/document/9679880) **(Greco et al., 2021)**
 
-```
-
-
 This repo contains the code for the DriftLens tool, a web application that allows users to run controlled drift experiments on pre-uploaded use cases or run drift detection on user-provided data.
 
 The demo paper about the tool is currently under review.

@@ -48,7 +48,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const numLabels = parseInt($("#num_labels").data("num-labels")); // Get the number of labels from the HTML
   const labelNames = $("#label_names").data("label-names").split(","); // Get label names from the HTML and split into an array
 
-
+  const fixedColors = [
+    "#FF6333", "#36A2EB", "#4CAF50", // Add more colors as needed
+     "#9966FF", "#FF9F40", "#4BC0C0",
+    "#FF6384", "#36A2EB", "#FFCE56", // Repeat or add different colors if you have more labels
+  ];
 
   const myChart_per_label = new Chart(ctx_per_label, {
     type: "line",
@@ -57,8 +61,10 @@ document.addEventListener("DOMContentLoaded", function () {
       datasets: Array.from({ length: numLabels }, (_, i) => ({
         label: labelNames[i], // Assign label names from the labelNames array
         data: [], // Initialize with empty data
-        borderColor: getRandomColor(),
-        backgroundColor: getRandomColor(),
+        //borderColor: getRandomColor(),
+        //backgroundColor: getRandomColor(),
+        borderColor: fixedColors[i % fixedColors.length], // Use fixed color based on index
+        backgroundColor: fixedColors[i % fixedColors.length], // Same color for background
         fill: false,
       })),
     },

@@ -54,33 +54,34 @@ document.addEventListener("DOMContentLoaded", function () {
     "#FF6384", "#36A2EB", "#FFCE56", // Repeat or add different colors if you have more labels
   ];
 
+  const useRandomColors = numLabels > 9;
+
   const myChart_per_label = new Chart(ctx_per_label, {
-    type: "line",
-    data: {
-      labels: [], // Initialize labels array for per-label chart
-      datasets: Array.from({ length: numLabels }, (_, i) => ({
-        label: labelNames[i], // Assign label names from the labelNames array
-        data: [], // Initialize with empty data
-        //borderColor: getRandomColor(),
-        //backgroundColor: getRandomColor(),
-        borderColor: fixedColors[i % fixedColors.length], // Use fixed color based on index
-        backgroundColor: fixedColors[i % fixedColors.length], // Same color for background
-        fill: false,
-      })),
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true, // You can customize other y-axis options here
-          title: {
-            display: true,
-            text: "Distribution Distance", // Set the label text here
+      type: "line",
+      data: {
+        labels: [], // Initialize labels array for per-label chart
+        datasets: Array.from({ length: numLabels }, (_, i) => ({
+          label: labelNames[i], // Assign label names from the labelNames array
+          data: [], // Initialize with empty data
+          borderColor: useRandomColors ? getRandomColor() : fixedColors[i % fixedColors.length], // Use random or fixed color based on condition
+          backgroundColor: useRandomColors ? getRandomColor() : fixedColors[i % fixedColors.length], // Same color for background
+          fill: false,
+        })),
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true, // You can customize other y-axis options here
+            title: {
+              display: true,
+              text: "Distribution Distance", // Set the label text here
+            },
           },
         },
+        borderWidth: 3,
       },
-      borderWidth: 3,
-    },
-  });
+    });
+
 
   // Show the loader and loading message initially
   if (loaderWrapper && loaderPercentage && loaderText) {

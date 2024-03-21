@@ -378,6 +378,8 @@
             });
 
             if (selectedModelInfo && selectedModelInfo.window_sizes) {
+                windowSizeDropdown.innerHTML = ""; // This clears all existing options
+
                 selectedModelInfo.window_sizes.forEach(function(windowSize) {
                     var option = document.createElement("option");
                     option.value = windowSize;

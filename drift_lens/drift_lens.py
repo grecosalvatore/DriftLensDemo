@@ -266,7 +266,7 @@ class DriftLens:
             E_w_l_idxs = np.nonzero(Y_w == label)
             E_w_l = E_w[E_w_l_idxs]
 
-            print(f"label {label}, Number of samples {len(E_w_l_idxs)}")
+            #print(f"label {label}, Number of samples {len(E_w_l_idxs)}")
 
             # Reduce the embedding dimensionality with PCA_l for current window w
             E_w_l_reduced = baseline.get_PCA_model_by_label(label).transform(E_w_l)
@@ -395,7 +395,7 @@ class DriftLensVisualizer:
         p = plt.plot(x_axis, utils.clear_complex_numbers(per_batch_distribution_distances))
         plt.scatter(x_axis, utils.clear_complex_numbers(per_batch_distribution_distances))
 
-        print(utils.clear_complex_numbers(per_batch_distribution_distances))
+        #print(utils.clear_complex_numbers(per_batch_distribution_distances))
 
         if plt_title is not None:
             plt.title(plt_title)

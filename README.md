@@ -21,7 +21,7 @@ The priliminary version of the *DriftLens* methodology was first proposed in the
 
 [Drift Lens: Real-time unsupervised Concept Drift detection by evaluating per-label embedding distributions](https://ieeexplore.ieee.org/document/9679880) **(Greco et al., 2021, International Conference on Data Mining Workshops (ICDMW))**
 
-
+If you want to learn more or use the **DriftLens** methodology, please visit the following [repository](https://github.com/grecosalvatore/drift-lens)
 
 
 # Table of Contents

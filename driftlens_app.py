@@ -25,13 +25,12 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'donsky!'
 socketio = SocketIO(app, cors_allowed_origins='*')
 
-"""
-Get current date time
-"""
+
 def get_current_datetime():
+    """ Get current date and time. """
     now = datetime.now()
-    #return now.strftime("%m/%d/%Y %H:%M:%S")
     return now.strftime("%H:%M:%S")
+
 
 def get_datasets_models_and_window_sizes():
     """ Get all datasets, models and window sizes available in the static folder. """
@@ -187,10 +186,12 @@ def run_drift_detection_background_thread(form_parameters, config_dict):
 
     if selected_drift_pattern == "no_drift":
         print("no drift")
+        # Get parameters from form for no drift
         selected_number_of_windows = int(form_parameters["number_of_windows_no_drift"])
         selected_latency = int(form_parameters["latency_no_drift"])
         print(selected_number_of_windows)
 
+        # Generate Windows for No Drift
         E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_without_drift_windows_generation(
             window_size=selected_window_size,
             n_windows=selected_number_of_windows,
@@ -200,6 +201,7 @@ def run_drift_detection_background_thread(form_parameters, config_dict):
 
     elif selected_drift_pattern == "sudden_drift":
         print("sudden drift")
+        # Get parameters from form for sudden drift
         selected_number_of_windows = int(form_parameters["number_of_windows_sudden_drift"])
         selected_latency = int(form_parameters["latency_sudden_drift"])
         selected_drift_offset = int(form_parameters["drift_offset_sudden_drift"])
@@ -208,6 +210,7 @@ def run_drift_detection_background_thread(form_parameters, config_dict):
         print(selected_drift_offset)
         print(selected_drift_percentage)
 
+        # Generate windows with sudden drift
         E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_incremental_drift_windows_generation(
             window_size=selected_window_size,
             n_windows=selected_number_of_windows,
@@ -220,12 +223,14 @@ def run_drift_detection_background_thread(form_parameters, config_dict):
 
     elif selected_drift_pattern == "incremental_drift":
         print("incremental drift")
+        # Get parameters from form for incremental drift
         selected_number_of_windows = int(form_parameters["number_of_windows_incremental_drift"])
         selected_latency = int(form_parameters["latency_incremental_drift"])
         selected_drift_offset = int(form_parameters["drift_offset_incremental_drift"])
         selected_starting_drift_percentage = int(form_parameters["drift_percentage_incremental_drift"]) / 100
         selected_increasing_drift_percentage = int(form_parameters["drift_increasing_percentage_incremental_drift"]) / 100
 
+        # Generate windows with incremental drift
         E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_incremental_drift_windows_generation(
             window_size=selected_window_size,
             n_windows=selected_number_of_windows,
@@ -239,13 +244,14 @@ def run_drift_detection_background_thread(form_parameters, config_dict):
 
     if selected_drift_pattern == "periodic_drift":
         print("periodic drift")
+        # Get parameters from form for periodic drift
         selected_number_of_windows = int(form_parameters["number_of_windows_periodic_drift"])
         selected_latency = int(form_parameters["latency_periodic_drift"])
         selected_drift_offset = int(form_parameters["drift_offset_periodic_drift"])
         selected_drift_duration = int(form_parameters["drift_duration_periodic_drift"])
         selected_drift_percentage = int(form_parameters["drift_percentage_periodic_drift"]) / 100
 
-
+        # Generate windows with periodic drift
         E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_periodic_drift_windows_generation(
             window_size=selected_window_size,
             n_windows=selected_number_of_windows,
@@ -260,14 +266,18 @@ def run_drift_detection_background_thread(form_parameters, config_dict):
     for i, (E_w, y_pred, y_true) in enumerate(zip(E_windows, Y_predicted_windows, Y_original_windows)):
         window_distance = dl.compute_window_distribution_distances(E_w, y_pred)
         window_distance["window_id"] = i
+
+        # Clear complex numbers from batch distance
         if isinstance(window_distance["batch"], complex):
             window_distance["batch"] = float(_utils.clear_complex_number(window_distance["batch"]).real)
 
+        # Check if the batch is drifted
         if window_distance["batch"] > selected_batch_threshold:
             batch_drift_prediction = 1
         else:
             batch_drift_prediction = 0
 
+        # Clear complex numbers from per-label distances
         for l in training_labels_id_list:
             if isinstance(window_distance["per-label"][str(l)], complex):
                 print("clearing:", window_distance["per-label"][str(l)])
@@ -279,6 +289,7 @@ def run_drift_detection_background_thread(form_parameters, config_dict):
         print(window_distance["per-label"])
         socketio.emit('updateDriftData', {'batch_distance': window_distance["batch"], "per_label_distances":per_label_distances ,
                                            "date": get_current_datetime(), "batch_drift_prediction":batch_drift_prediction, "window_id":i})
+
         socketio.sleep(selected_latency/1000)
 
 @app.route("/drift_lens_monitor", methods=["GET", "POST"])
@@ -314,7 +325,7 @@ def drift_lens_monitor_new_experiment():
 
     if request.method == "POST":
         all_parameters = request.form.to_dict()
-        print(all_parameters)
+        #print(all_parameters)
     global thread
     print('Client connected')
 
@@ -456,7 +467,7 @@ def estimate_threshold():
         shutil.rmtree(th_path)  # Removes all the subdirectories!
         os.makedirs(th_path)
 
-
+    # Save the threshold values
     with open(os.path.join(th_path, "th_batch.npy"), 'wb') as f:
         np.save(f, per_batch_distances_sorted)
 

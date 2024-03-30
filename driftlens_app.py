@@ -131,7 +131,8 @@ def run_drift_detection_background_new_experiment_thread(form_parameters):
         if isinstance(window_distance["batch"], complex):
             window_distance["batch"] = float(_utils.clear_complex_number(window_distance["batch"]).real)
 
-        if window_distance["batch"] > selected_batch_threshold:
+        #if window_distance["batch"] > selected_batch_threshold:
+        if window_distance["batch"] > 20:
             batch_drift_prediction = 1
         else:
             batch_drift_prediction = 0
@@ -435,7 +436,7 @@ def estimate_threshold():
     per_batch_distances = []
     per_label_distances = {label: [] for label in training_label_list}
 
-    for i in range(100):
+    for i in range(1000):
         E_windows, Y_predicted_windows, Y_original_windows = wg.balanced_without_drift_windows_generation(
             window_size=500,
             n_windows=1,
@@ -453,7 +454,7 @@ def estimate_threshold():
     per_batch_distances_arr = np.array(per_batch_distances)
     indices = (-per_batch_distances_arr).argsort()
     per_batch_distances_sorted = per_batch_distances_arr[indices]
-    per_batch_distances_sorted = per_batch_distances_sorted + 1.2
+    per_batch_distances_sorted = per_batch_distances_sorted + 2.0
 
     for l in training_label_list:
         per_label_distances[l] = sorted(per_label_distances[l], reverse=True)

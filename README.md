@@ -334,12 +334,13 @@ If you use the DriftLens methodology or tool, please cite the following papers:
 **DriftLens Tool**
 ```bibtex
 @inproceedings{greco2024driftlens,
-  title={DriftLens: A Concept Drift Detection Tool.},
-  author={Greco, Salvatore and Vacchetti, Bartolomeo and Apiletti, Daniele and Cerquitelli, Tania},
-  booktitle={EDBT},
-  url={https://openproceedings.org/2024/conf/edbt/paper-239.pdf
+  title={DriftLens: A Concept Drift Detection Tool},
+  author={Greco, Salvatore and Vacchetti, Bartolomeo and Apiletti, Daniele and Cerquitelli, Tania and others},
+  booktitle={Advances in Database Technology},
+  volume={27},
   pages={806--809},
-  year={2024}
+  year={2024},
+  organization={Open proceedings}
 }
 ```
 
